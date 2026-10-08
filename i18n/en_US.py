@@ -244,6 +244,8 @@ STRINGS = {
     "empty.completed_title": "No completed tasks yet",
     "empty.completed_hint": "Finish something and it will show up here.",
     "empty.reminder_hint": "System reminders will be logged here once tasks fall due.",
+    "settings.appearance.restart_hint": "Theme base changed: most of the UI updates immediately; restart TaiPlan to fully switch the title bar and the calendar as well.",
+    "settings.appearance.restart_now": "Restart TaiPlan now",
     "settings.appearance.note": "The accent is a restrained coral red; theme and density apply instantly and are persisted.",
     "settings.appearance.save": "Save appearance",
     "settings.appearance.saved": "Appearance saved",

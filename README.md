@@ -5,7 +5,7 @@
 A local-first task and time planning desktop app for Windows.
 Designed & Developed by **TaiWoo_Chen**.
 
-Version 0.1.1 · MIT License
+Version 0.1.2 · MIT License
 
 [中文说明 / Chinese README](README.zh-CN.md)
 
@@ -89,7 +89,7 @@ More precisely:
 
 ## Install on Windows
 
-1. Run `TaiPlan-Setup-0.1.1.exe`.
+1. Run `TaiPlan-Setup-0.1.2.exe`.
 2. It installs for the current user only — no administrator rights, and the default
    location is:
 

@@ -163,6 +163,13 @@ def main(argv=None) -> int:
         import frozen_smoke
         return frozen_smoke.run_smoke_test()
 
+    if "--relaunch" in argv:
+        # 0.1.2：设置改主题基座后的自重启。与 --shutdown 相同的优雅退出路径，
+        # 区别仅在于退出后由 runtime 消费标记文件重新拉起。
+        import desktop_runtime
+
+        return desktop_runtime.request_shutdown()
+
     if SHUTDOWN_FLAG in argv:
         # 第 17 阶段：让运行中的实例优雅退出；没有实例则直接 exit 0（不起新实例）
         import desktop_runtime

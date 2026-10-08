@@ -5,7 +5,7 @@
 本地优先的任务与时间规划桌面应用（Windows）。
 设计并开发：**TaiWoo_Chen**
 
-版本 0.1.1 · MIT License
+版本 0.1.2 · MIT License
 
 [English README](README.md)
 
@@ -84,7 +84,7 @@ TaiPlan 把"一件事"变成"一天里的一段时间"。它用轻量的待办�
 
 ## Windows 安装
 
-1. 运行 `TaiPlan-Setup-0.1.1.exe`。
+1. 运行 `TaiPlan-Setup-0.1.2.exe`。
 2. 按**当前用户**安装，不需要管理员权限，默认目录：
 
    ```

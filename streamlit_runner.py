@@ -63,13 +63,21 @@ def streamlit_command(port) -> list:
     port = int(port)
     if is_frozen():
         return [sys.executable, CHILD_FLAG, "--port", str(port)]
-    return [
+    command = [
         sys.executable,
         "-m", "streamlit", "run", str(app_script_path()),
         "--server.headless", "true",
         "--server.port", str(port),
         "--browser.gatherUsageStats", "false",
     ]
+    try:
+        import ui.theme as _theme
+
+        for key, value in _theme.streamlit_theme_options().items():
+            command += [f"--{key}", str(value)]
+    except Exception:  # noqa: BLE001
+        pass
+    return command
 
 
 def child_flag_options(port) -> dict:
@@ -78,7 +86,7 @@ def child_flag_options(port) -> dict:
     键名用的是**配置项名**（bootstrap.load_config_options 会把下划线换成点，
     点号形式原样保留）。
     """
-    return {
+    options = {
         # PyInstaller 打包后 streamlit/__file__ 不含 site-packages，
         # Streamlit 据此把 developmentMode 判成 True，而它与 server.port 互斥
         # （config._check_conflicts 会直接抛 RuntimeError）。必须显式关掉。
@@ -91,6 +99,17 @@ def child_flag_options(port) -> dict:
         #   不是猜测；source dev 模式不设这一项，保留开发工具。
         "client.toolbarMode": "minimal",
     }
+    # ★ 0.1.2：把用户的外观选择传成 Streamlit 主题基座。
+    #   没有这一步，"系统深色 + 应用浅色"时 widget 与 components iframe
+    #   （日历）仍按系统 dark 渲染（黑按钮/隐形文字/深色日历）。
+    try:
+        import ui.theme as _theme
+
+        options.update(_theme.streamlit_theme_options())
+    except Exception:  # noqa: BLE001
+        # 主题参数只是外观；读不到配置绝不能拦住启动
+        pass
+    return options
 
 
 # 父进程所有权（child 端 watchdog 用；不硬编码任何值）

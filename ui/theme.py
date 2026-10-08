@@ -122,6 +122,20 @@ FONT_STACK = ('"Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", '
 # 外观配置（持久化）
 # ---------------------------------------------------------------
 
+_startup_mode = None       # 本次启动生效的 mode（浅色/深色/跟随系统）；进程内不变
+
+
+def _init_startup_mode():
+    """记录本次启动时的 mode；保存外观时用它判断"主题基座是否变了"。"""
+    global _startup_mode
+    if _startup_mode is None:
+        try:
+            _startup_mode = load_appearance().get("mode", MODE_SYSTEM)
+        except Exception:  # noqa: BLE001
+            _startup_mode = MODE_SYSTEM
+    return _startup_mode
+
+
 def load_appearance():
     return config_store.read_json_config(CONFIG_PATH, defaults=DEFAULTS)
 
@@ -130,6 +144,33 @@ def save_appearance(cfg):
     data = {k: cfg.get(k, DEFAULTS[k]) for k in DEFAULTS}
     config_store.write_json_config_atomic(CONFIG_PATH, data)
     return data
+
+
+def streamlit_theme_options(cfg=None) -> dict:
+    """给 Streamlit server 的 theme.* 配置（决定 widget / iframe 的主题基座）。
+
+    用户显式选择浅色/深色时照传；"跟随系统"时不传 base，让 Streamlit 继续
+    按系统偏好决定（保持默认行为，同时避免 server 端追不上系统切换的时差）。
+    返回 {} 表示没有需要覆写的配置。
+    """
+    cfg = cfg or load_appearance()
+    mode = cfg.get("mode", MODE_SYSTEM)
+    resolved = resolve_mode(cfg)
+    options: dict[str, str] = {}
+    if mode in (MODE_LIGHT, MODE_DARK):
+        options["theme.base"] = resolved
+    accent = cfg.get("accent", "coral")
+    if accent == "coral":
+        options["theme.primaryColor"] = "#D9503F" if resolved == "light" else "#F38A7A"
+    if resolved == "dark":
+        options["theme.backgroundColor"] = DARK["bg_primary"]
+        options["theme.secondaryBackgroundColor"] = DARK["surface"]
+        options["theme.textColor"] = DARK["text_primary"]
+    else:
+        options["theme.backgroundColor"] = LIGHT["bg_primary"]
+        options["theme.secondaryBackgroundColor"] = LIGHT["surface"]
+        options["theme.textColor"] = LIGHT["text_primary"]
+    return options
 
 
 def system_is_dark():
@@ -290,6 +331,86 @@ def _sidebar_narrow_css():
 """
 
 
+def _streamlit_widget_override_css(mode):
+    """按 resolved mode 覆写 Streamlit 内置 widget 的具体色值（CSS 兜底层）。
+
+    场景：Streamlit 的主题基座在页面加载时按**系统**主题生成；用户随后在应用内
+    切换主题时，基座不变。下面的规则把高频部件（radio/checkbox/按钮/输入框/
+    expander/下载按钮/提示气泡）的关键前景/背景色显式钉住，保证
+    "系统深色 + 应用浅色"（或反向）在**不重启**的当场也不会出现黑底黑字。
+    完全正确的切换由 server 端 theme.base + 重启保证（见 streamlit_runner）。
+    """
+    t = tokens(mode)
+    bg = t["bg_primary"]
+    surface = t["surface"]
+    hover = t["surface_hover"]
+    text = t["text_primary"]
+    text2 = t["text_secondary"]
+    border = t["border_subtle"]
+    return f"""
+/* ==== 0.1.2 CSS 兜底：按应用主题钉住内置 widget 色值 ==== */
+.stApp {{
+    --primary-color: var(--accent) !important;
+    --text-color: {text} !important;
+    --background-color: {bg} !important;
+    --secondary-background-color: {surface} !important;
+}}
+/* radio / checkbox 文字（"隐形文字"的主因） */
+.stApp label, .stApp p, .stApp span {{
+    color: inherit;
+}}
+.stApp [data-testid="stRadio"] label,
+.stApp [data-testid="stCheckbox"] label,
+.stApp [data-testid="stToggle"] label {{
+    color: {text} !important;
+}}
+.stApp [data-testid="stRadio"] label p,
+.stApp [data-testid="stCheckbox"] label p {{
+    color: {text} !important;
+}}
+/* 原生按钮：避免 dark 基座下的黑底黑字 */
+.stApp button[kind="secondary"] {{
+    background: {surface} !important;
+    border-color: {border} !important;
+    color: {text} !important;
+}}
+.stApp button[kind="secondary"]:hover {{
+    background: {hover} !important;
+}}
+.stApp button[kind="primary"] {{
+    background: var(--accent) !important;
+    color: var(--accent-text) !important;
+}}
+/* 输入框 / 下拉 / 文本域 */
+.stApp [data-testid="stTextInput"] input,
+.stApp [data-testid="stTextArea"] textarea,
+.stApp [data-testid="stSelectbox"] > div,
+.stApp [data-testid="stNumberInput"] input {{
+    background: {surface} !important;
+    color: {text} !important;
+    border-color: {border} !important;
+}}
+.stApp [data-testid="stSelectbox"] svg {{
+    fill: {text2} !important;
+}}
+/* expander 与分隔线 */
+.stApp [data-testid="stExpander"] details {{
+    background: {surface} !important;
+    border-color: {border} !important;
+}}
+.stApp hr {{
+    border-color: {border} !important;
+}}
+/* Markdown 正文 / caption */
+.stApp [data-testid="stMarkdownContainer"] {{
+    color: {text};
+}}
+/* 下载/上传按钮区域 */
+.stApp [data-testid="stDownloadButton"] button,
+.stApp [data-testid="stFileUploader"] {{
+    color: {text};
+}}
+"""
 def build_css(mode, density=DENSITY_COMFORT, sidebar_pinned=True):
     t = tokens(mode)
     compact = density == DENSITY_COMPACT
@@ -297,6 +418,7 @@ def build_css(mode, density=DENSITY_COMFORT, sidebar_pinned=True):
     rail_extra = _sidebar_labels_css(not sidebar_pinned)
     common_css = _rail_common_css()
     narrow_css = _sidebar_narrow_css()
+    widget_override = _streamlit_widget_override_css(mode)
     row_pad = "6px 10px" if compact else "10px 12px"
     card_pad = "10px 12px" if compact else "14px 16px"
     gap = "6px" if compact else "10px"
@@ -658,7 +780,8 @@ html, body, .stApp, [data-testid="stAppViewContainer"] {{
     padding: 0 .2rem;
 }}
 
-{narrow_css}{rail_extra}
+{narrow_css}
+{widget_override}{rail_extra}
 </style>
 """
 

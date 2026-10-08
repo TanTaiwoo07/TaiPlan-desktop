@@ -40,7 +40,7 @@ sent only in the authentication header of those requests by the provider client.
 
 ## Known limitations
 
-- Release builds for 0.1.1 are **not code-signed**, so Windows SmartScreen may warn on
+- Release builds for 0.1.2 are **not code-signed**, so Windows SmartScreen may warn on
   first run.
 - The AI feature trusts the provider the user configures; TaiPlan does not proxy or
   re-encrypt that traffic.

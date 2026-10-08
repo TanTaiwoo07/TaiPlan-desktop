@@ -255,6 +255,8 @@ STRINGS = {
     "empty.completed_title": "还没有已完成的任务",
     "empty.completed_hint": "完成一件事之后，它会出现在这里。",
     "empty.reminder_hint": "任务到期后，系统提醒会记录在这里。",
+    "settings.appearance.restart_hint": "主题基座已变化：大部分界面已立即更新；重启应用后标题栏与日历等剩余部分也会完全切换。",
+    "settings.appearance.restart_now": "立即重启 TaiPlan",
     "settings.appearance.note": "强调色固定为克制的珊瑚红；主题与密度会立即生效并持久化。",
     "settings.appearance.save": "保存外观",
     "settings.appearance.saved": "外观已保存",

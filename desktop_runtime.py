@@ -81,8 +81,8 @@ def _choose_streamlit_port():
 _logger = logging.getLogger("desktop_runtime")
 
 
-def _log(msg):
-    print(msg, flush=True)
+def _log(msg, *args):
+    print(msg % args if args else msg, flush=True)
 
 
 def _setup_logging(debug=False):
@@ -648,6 +648,31 @@ def should_show_error_box(argv=None) -> bool:
     return not any(flag in argv for flag in UNATTENDED_FLAGS)
 
 
+def _maybe_relaunch_after_exit():
+    """UI 重启机制（0.1.2）：state/ui_restart.flag 存在 → 优雅退出完成后拉起新实例。
+
+    标记由设置页"立即重启"写入；这里只负责"退出后拉起"，不判断原因。
+    拉起失败绝不弹窗、不重试（避免重启风暴）——下次用户双击图标照常可用。
+    """
+    try:
+        flag = app_paths.get_restart_flag_path()
+        if not flag.is_file():
+            return
+        payload = flag.read_text(encoding="utf-8", errors="replace")[:256]
+        flag.unlink(missing_ok=True)
+        _log("[Todo Runtime] 检测到 UI 重启标记，重新拉起应用……")
+        exe = Path(sys.executable)
+        if exe.name.lower() == "python.exe" or exe.name.lower() == "pythonw.exe":
+            command = [str(exe), "-X", "utf8", str(PROJECT_DIR / "desktop_runtime.py")]
+        else:
+            command = [str(exe)]
+        subprocess.Popen(command, cwd=str(PROJECT_DIR),
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        _log("[Todo Runtime] UI 重启：新进程已拉起（%s）", payload.strip() or "no-detail")
+    except Exception as exc:  # noqa: BLE001
+        _log("[Todo Runtime] UI 重启失败（不影响本次退出）：%s", type(exc).__name__)
+
+
 def main():
     args = sys.argv[1:]
     # 防呆：子进程模式绝不能又起一套桌面运行时（Tray/Worker/pywebview/单实例锁）
@@ -683,6 +708,9 @@ def main():
         runtime.shutdown()
     except Exception as exc:  # noqa: BLE001
         _logger.exception("desktop runtime failed")
+        _maybe_relaunch_after_exit()
+    else:
+        _maybe_relaunch_after_exit()
         if should_show_error_box(args):
             _show_error_box("TaiPlan 启动失败。\n详细原因已写入日志目录。")
         else:

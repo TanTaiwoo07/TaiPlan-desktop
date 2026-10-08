@@ -1584,11 +1584,30 @@ def _settings_appearance():
                            cfg.get("density", ui_theme.DENSITY_COMFORT)),
                        key="appearance_density", horizontal=True, format_func=ui_theme.density_label)
     st.caption(t('settings.appearance.note'))
+    base_changed = (mode != ui_theme._startup_mode)
     if st.button(t('settings.appearance.save'), key="appearance_save", type="primary"):
         ui_theme.save_appearance({"mode": mode, "density": density,
                                   "accent": cfg.get("accent", "coral")})
         ui_components.toast_ok(t('settings.appearance.saved'))
+        if base_changed:
+            st.session_state["appearance_needs_restart"] = True
         st.rerun()
+
+    if st.session_state.get("appearance_needs_restart"):
+        st.info(t('settings.appearance.restart_hint'))
+        if st.button(t('settings.appearance.restart_now'), key="appearance_relaunch",
+                     type="primary"):
+            try:
+                import app_paths as _ap
+
+                flag = _ap.get_restart_flag_path()
+                flag.parent.mkdir(parents=True, exist_ok=True)
+                flag.write_text("theme-base-changed", encoding="utf-8")
+            except OSError:
+                pass
+            import desktop_runtime as _rt
+
+            _rt.request_shutdown()  # 优雅退出；runtime 收尾后按标记自动拉起
 
 
 def _settings_desktop():
@@ -1988,7 +2007,9 @@ def main():
     # 必须在任何 edit widget 实例化之前处理编辑会话
     edit_session.prepare(services)
 
+    ui_components.keyboard_shortcuts_js()
     appearance = ui_theme.load_appearance()
+    ui_theme._init_startup_mode()
     ui_theme.inject_theme(ui_theme.resolve_mode(appearance),
                         appearance.get("density"),
                         ui_layout.is_pinned())
