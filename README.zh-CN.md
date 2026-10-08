@@ -1,5 +1,7 @@
 # TaiPlan
 
+![TaiPlan — 日历与时间块（浅色主题）](assets/promo_calendar_light.png)
+
 **Tasks into time.**
 
 本地优先的任务与时间规划桌面应用（Windows）。
