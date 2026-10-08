@@ -1,3 +1,7 @@
 * text=auto
 *.vbs text eol=crlf
 *.bat text eol=crlf
+
+# 发布产物必须按二进制存储，禁止任何行尾/编码规范化（否则 SHA256 会对不上）
+*.exe binary
+*.sha256 text eol=lf

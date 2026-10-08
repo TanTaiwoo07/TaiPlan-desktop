@@ -6,11 +6,13 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
-# ---- 构建与发布产物 ----
+# ---- 构建中间产物（不进仓库）----
 build/
 dist/
-release/
 benchmarks/dist_after.json
+
+# ---- 发布产物：release/ 进仓库（安装包 + .sha256 校验文件）----
+# 注意：dist/ 是 193MB 的 onedir 目录，不入库；只入库压缩后的 Setup.exe
 
 # ---- 开发/走查期间的临时工作区 ----
 .zwork_todo_build/
@@ -44,7 +46,8 @@ ai_config.local.json
 *secret*
 *Backup*/
 *backup*/
-*.sha256
+# 注：*.sha256 不再整体忽略——release/ 下的安装包校验值是发布物的一部分。
+# 其余位置的 .sha256（如本地临时校验）仍按各自目录规则处理。
 
 # ---- 编辑器 / 系统 ----
 .vscode/
