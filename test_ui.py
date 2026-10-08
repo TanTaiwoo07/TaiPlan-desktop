@@ -3,6 +3,7 @@
 不启动真实 App、不写真实配置文件（全部指向临时路径）。
 """
 
+import io
 import os
 import re
 import tempfile
@@ -370,3 +371,18 @@ class ShellRenderTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class KeyboardShortcutTest(unittest.TestCase):
+    """Ctrl+N 快捷键：JS 注入存在且幂等、挂载点在主入口。"""
+
+    BASE = Path(__file__).resolve().parent
+
+    def test_helper_exists_and_idempotent(self):
+        src = io.open(self.BASE / "ui" / "components.py",
+                      encoding="utf-8-sig").read()
+        self.assertIn("def keyboard_shortcuts_js", src)
+        self.assertIn("__taiplanHotkeys", src, "必须幂等（防重复监听）")
+
+    def test_mounted_in_main_flow(self):
+        src = io.open(self.BASE / "app.py", encoding="utf-8-sig").read()
+        self.assertIn("ui_components.keyboard_shortcuts_js()", src)

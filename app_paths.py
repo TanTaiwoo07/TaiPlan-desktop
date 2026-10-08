@@ -137,6 +137,14 @@ def get_logs_dir() -> Path:
     return get_user_data_dir() / LOGS_DIRNAME
 
 
+RESTART_FLAG_FILENAME = "ui_restart.flag"
+
+
+def get_restart_flag_path() -> Path:
+    """UI 重启标记：设置保存"需要重启"时写入，runtime 退出前消费。"""
+    return get_state_path(RESTART_FLAG_FILENAME)
+
+
 def get_bootstrap_logs_dir() -> Path:
     """迁移/全新判定**之前**的日志目录：放在 %TEMP%，绝不触碰正式数据目录。
 

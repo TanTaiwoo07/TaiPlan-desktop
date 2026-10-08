@@ -84,6 +84,31 @@ def overdue_banner(count, key=None):
     return st.toggle(t("common.expand"), key=key or "overdue_toggle") if count else False
 
 
+def keyboard_shortcuts_js():
+    """全局快捷键（第一组）：Ctrl+N / Cmd+N → 点击「新建任务」按钮。
+
+    一次性注入零依赖 JS；幂等（重复渲染不叠加监听器）。
+    Esc 关闭对话框由 Streamlit 原生支持，不在此处理。
+    """
+    st.markdown(
+        """<script id="taiplan-hotkeys">
+        (function () {
+          if (window.__taiplanHotkeys) return;
+          window.__taiplanHotkeys = true;
+          document.addEventListener('keydown', function (ev) {
+            if ((ev.ctrlKey || ev.metaKey) && !ev.shiftKey && !ev.altKey
+                && (ev.key === 'n' || ev.key === 'N')) {
+              const btn = [...document.querySelectorAll('.st-key-primaryaction button')]
+                .find(b => !b.disabled);
+              if (btn) { ev.preventDefault(); btn.click(); }
+            }
+          });
+        })();
+        </script>""",
+        unsafe_allow_html=True,
+    )
+
+
 def progress_line(done, total):
     ratio = (done / total) if total else 0.0
     st.progress(ratio)

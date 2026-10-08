@@ -3,6 +3,23 @@
 All notable changes to TaiPlan are documented in this file.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] - 2026-10-08
+
+### Fixed
+
+- **Theme switching on dark-mode systems**: choosing Light in the app while Windows uses
+  dark mode left the title bar, native widgets (radio buttons, secondary buttons) and the
+  calendar iframe dark. The user's theme choice is now passed to the Streamlit server as
+  the theme base (components included), the desktop window background follows the saved
+  theme, and a CSS fallback pins built-in widget colors so the UI stays readable even
+  before a restart. Saving a theme whose base changed now offers "Restart TaiPlan now"
+  (graceful restart via the existing single-instance shutdown path).
+
+### Added
+
+- Keyboard shortcut: `Ctrl+N` / `Cmd+N` opens the new-task dialog from the Today page.
+  (Esc closes dialogs natively.)
+
 ## [0.1.1] - 2026-10-07
 
 ### Added
