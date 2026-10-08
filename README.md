@@ -136,7 +136,7 @@ py -3.14 -m venv .venv
 Tests:
 
 ```bat
-.venv\Scripts\python.exe -m unittest discover -p "test_*.py"
+.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
 ```
 
 Building the Windows executable and installer:
@@ -149,7 +149,7 @@ Building the Windows executable and installer:
 
 Developer conventions, project layout and packaging notes are in
 [CONTRIBUTING.md](CONTRIBUTING.md). Third-party components and their licenses are listed
-in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt).
+in [THIRD_PARTY_NOTICES.txt](docs/THIRD_PARTY_NOTICES.txt).
 
 ## Project layout
 

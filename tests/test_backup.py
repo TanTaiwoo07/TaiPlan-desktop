@@ -6,7 +6,7 @@ import unittest
 import unittest.mock as mock
 from pathlib import Path
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
 import app_paths
 import data_backup

@@ -13,7 +13,7 @@ import create_shortcut
 import launcher
 import startup_manager
 
-PROJECT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = Path(__file__).resolve().parent.parent
 VBS = PROJECT_DIR / "start_todo_silent.vbs"
 
 

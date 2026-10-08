@@ -21,7 +21,7 @@ import runtime_diagnostics
 import third_party_notices
 import version
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 
 
 class ReleaseArtifactTest(unittest.TestCase):
@@ -55,7 +55,7 @@ class ReleaseArtifactTest(unittest.TestCase):
 
 class ReleaseNotesTest(unittest.TestCase):
     def _notes(self):
-        return io.open(ROOT / "RELEASE_NOTES.md", encoding="utf-8").read()
+        return io.open(ROOT / "docs" / "RELEASE_NOTES.md", encoding="utf-8").read()
 
     def test_exists_and_has_version(self):
         """版本号必须与 version.py 一致（升版时这里不该再写死旧版本）。"""
@@ -87,10 +87,10 @@ class ReleaseNotesTest(unittest.TestCase):
 
 class ThirdPartyNoticesTest(unittest.TestCase):
     def _text(self):
-        return (ROOT / "THIRD_PARTY_NOTICES.txt").read_text(encoding="utf-8")
+        return (ROOT / "docs" / "THIRD_PARTY_NOTICES.txt").read_text(encoding="utf-8")
 
     def test_file_exists(self):
-        self.assertTrue((ROOT / "THIRD_PARTY_NOTICES.txt").is_file())
+        self.assertTrue((ROOT / "docs" / "THIRD_PARTY_NOTICES.txt").is_file())
 
     def test_licenses_come_from_real_metadata(self):
         """许可证必须来自真实 metadata（不是手写也不是猜的）。"""

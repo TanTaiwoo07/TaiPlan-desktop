@@ -14,7 +14,7 @@ import version  # noqa: E402
 
 _VERSION = version.__version__
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 EXE = ROOT / "dist" / "TaiPlan" / "TaiPlan.exe"
 
 EXPECTED = {

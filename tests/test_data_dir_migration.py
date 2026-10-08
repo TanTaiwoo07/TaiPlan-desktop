@@ -19,9 +19,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import tests_env  # noqa: F401  必须早于项目模块导入
+from tests import tests_env  # noqa: F401  必须早于项目模块导入
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import app_paths  # noqa: E402

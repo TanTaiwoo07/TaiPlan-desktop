@@ -25,7 +25,7 @@ import main as main_module
 import startup_manager
 import version
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 ISS = ROOT / "installer" / "TaiPlan.iss"
 ISS_TEXT = io.open(ISS, encoding="utf-8-sig").read()
 

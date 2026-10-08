@@ -87,8 +87,8 @@ Name: "startupicon"; Description: "随 Windows 启动 {#MyAppName}"; GroupDescri
 ; 只安装 onedir 产物；不安装源码、VBS、BAT、任何用户数据
 Source: "..\dist\TaiPlan\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\dist\TaiPlan\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "..\RELEASE_NOTES.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\THIRD_PARTY_NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\docs\RELEASE_NOTES.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\docs\THIRD_PARTY_NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{userprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"; IconFilename: "{app}\{#MyAppExeName}"

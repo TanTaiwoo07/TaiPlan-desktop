@@ -128,7 +128,7 @@ py -3.14 -m venv .venv
 测试：
 
 ```bat
-.venv\Scripts\python.exe -m unittest discover -p "test_*.py"
+.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
 ```
 
 构建可执行文件与安装包：
@@ -140,7 +140,7 @@ py -3.14 -m venv .venv
 ```
 
 开发约定、目录结构与打包说明见 [CONTRIBUTING.md](CONTRIBUTING.md)；第三方组件与许可证见
-[THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt)。
+[THIRD_PARTY_NOTICES.txt](docs/THIRD_PARTY_NOTICES.txt)。
 
 ## 目录结构
 

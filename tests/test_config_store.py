@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
 import app_paths
 import config_store

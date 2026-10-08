@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
 import app_paths
 import data_migration

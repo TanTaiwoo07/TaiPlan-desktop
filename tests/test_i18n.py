@@ -111,7 +111,7 @@ class TranslationTest(unittest.TestCase):
         import re
         from pathlib import Path
 
-        root = Path(__file__).resolve().parent
+        root = Path(__file__).resolve().parent.parent
         files = [root / "app.py", root / "calendar_view.py", root / "tray_app.py"]
         files += sorted((root / "ui").glob("*.py"))
         bad = re.compile(r"if\s+(lang|language|locale)\s*==")
@@ -177,7 +177,7 @@ class DateLocalizationTest(unittest.TestCase):
         import io
         from pathlib import Path
 
-        with io.open(Path(__file__).resolve().parent / "i18n" / "dates.py",
+        with io.open(Path(__file__).resolve().parent.parent / "i18n" / "dates.py",
                      encoding="utf-8") as fh:
             src = fh.read()
         self.assertNotIn("setlocale", src)

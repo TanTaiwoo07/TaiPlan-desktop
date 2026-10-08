@@ -17,9 +17,9 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 

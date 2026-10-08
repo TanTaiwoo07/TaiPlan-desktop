@@ -18,9 +18,9 @@ import ui.icons as icons
 
 from streamlit.testing.v1 import AppTest
 
-import tests_env  # noqa: F401  必须早于项目模块导入（隔离数据目录）
+from tests import tests_env  # noqa: F401  必须早于项目模块导入（隔离数据目录）
 
-PROJECT_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = Path(__file__).resolve().parent.parent
 from datetime import date as _date
 from datetime import timedelta
 APP_PATH = PROJECT_DIR / "app.py"

@@ -9,9 +9,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
-PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import build  # noqa: E402

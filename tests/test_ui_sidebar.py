@@ -15,7 +15,7 @@ import re
 import unittest
 from pathlib import Path
 
-import tests_env  # noqa: F401  必须早于项目模块导入
+from tests import tests_env  # noqa: F401  必须早于项目模块导入
 
 import ui.icons as icons
 import ui.layout as layout
@@ -23,8 +23,8 @@ import ui.theme as theme
 
 from streamlit.testing.v1 import AppTest
 
-APP_PATH = str(Path(__file__).resolve().parent / "app.py")
-ROOT = Path(__file__).resolve().parent
+APP_PATH = str(Path(__file__).resolve().parent.parent / "app.py")
+ROOT = Path(__file__).resolve().parent.parent
 
 
 class _Base(unittest.TestCase):
@@ -281,16 +281,16 @@ class TooltipResidueTest(unittest.TestCase):
         return rows
 
     def test_no_help_tooltips_in_sidebar(self):
-        path = Path(__file__).resolve().parent / "ui" / "layout.py"
+        path = Path(__file__).resolve().parent.parent / "ui" / "layout.py"
         self.assertEqual(self._help_calls(path), [],
                          "侧栏不允许再出现 help=（会留下不消失的提示气泡）")
 
     def test_nav_labels_are_still_rendered_and_hover_revealed(self):
         """去掉气泡不等于去掉标签：标签仍渲染，rail 悬停由 CSS 恢复。"""
-        src = io.open(Path(__file__).resolve().parent / "ui" / "layout.py",
+        src = io.open(Path(__file__).resolve().parent.parent / "ui" / "layout.py",
                       encoding="utf-8-sig").read()
         self.assertIn('st.button(label, key=f"nav_item_{key}"', src)
-        theme = io.open(Path(__file__).resolve().parent / "ui" / "theme.py",
+        theme = io.open(Path(__file__).resolve().parent.parent / "ui" / "theme.py",
                         encoding="utf-8-sig").read()
         self.assertIn('.st-key-appnav [data-testid="stButton"] button p', theme)
         self.assertIn('[data-testid="stSidebar"]:not(:hover)', theme)

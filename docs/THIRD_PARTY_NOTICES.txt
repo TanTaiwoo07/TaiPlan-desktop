@@ -79,7 +79,7 @@ keyring             25.7.0
                     许可证 : MIT
                     主页   : https://github.com/jaraco/keyring
 
-MarkupSafe          3.0.3
+MarkupSafe          3.0.4
                     许可证 : BSD-3-Clause
                     主页   : https://palletsprojects.com/donate
 
@@ -115,7 +115,7 @@ pyarrow             25.0.1
                     许可证 : Apache-2.0
                     主页   : https://arrow.apache.org/
 
-pycparser           3.0
+pycparser           3.1
                     许可证 : BSD-3-Clause
                     主页   : https://github.com/eliben/pycparser
 
@@ -135,7 +135,7 @@ python-multipart    0.0.32
                     许可证 : Apache Software License
                     主页   : https://github.com/Kludex/python-multipart
 
-pythonnet           3.2.0
+pythonnet           3.2.1
                     许可证 : MIT
                     主页   : https://pythonnet.github.io/
 
@@ -171,10 +171,6 @@ streamlit-calendar  1.4.0
                     许可证 : Apache-2.0
                     主页   : https://github.com/im-perativa/streamlit-calendar
 
-toasted             0.2.0
-                    许可证 : MIT License
-                    主页   : https://github.com/ysfchn/toasted
-
 toml                0.10.2
                     许可证 : MIT
                     主页   : https://github.com/uiri/toml
@@ -183,7 +179,7 @@ typing_extensions   4.16.0
                     许可证 : PSF-2.0
                     主页   : https://github.com/python/typing_extensions/issues
 
-tzdata              2026.4
+tzdata              2026.5
                     许可证 : Apache-2.0
                     主页   : https://github.com/python/tzdata
 
@@ -210,13 +206,13 @@ winotify            1.1.0
 ------------------------------------------------------------
 未解析 / 未列入（保证不漏也不多）
 ------------------------------------------------------------
-bundle 顶层名：107 个，映射到发行版：49 个
-事实来源：PYZ-00.toc（223 个顶层模块） ∪ _internal 顶层目录
-项目自有资源（非第三方，不计入）：ai_client, ai_settings, analyze_dist, app, app_metadata, app_paths, assets, benchmark, build, build_installer, build_release, calendar_adapter, calendar_settings, calendar_view, config, config_store, create_shortcut, data_backup, data_dir_migration, data_migration, database, datetime_parser, desktop_notifier, desktop_runtime, desktop_window, dynamic_port, edit_session, first_run, frozen_smoke, i18n, ics_import, language_store, launcher, logging_config, models, nlp_parser, notification_service, packaging_tools, performance, product_info, recurrence, reminder_worker, runtime_config, runtime_diagnostics, services, startup_manager, streamlit_runner, tests_env, third_party_notices, tools, tray_app, ui, verify_installer_failure, version, windows_app_registration
-映射不到发行版的第三方目录（人工复核）：numpy.libs, pandas.libs, pyarrow.libs
+bundle 顶层名：107 个，映射到发行版：48 个
+事实来源：PYZ-00.toc（222 个顶层模块） ∪ _internal 顶层目录
+项目自有资源（非第三方，不计入）：ai_client, ai_settings, analyze_dist, app, app_metadata, app_paths, assets, benchmark, build, build_installer, build_release, calendar_adapter, calendar_settings, calendar_view, config, config_store, create_shortcut, data_backup, data_dir_migration, data_migration, database, datetime_parser, desktop_notifier, desktop_runtime, desktop_window, dynamic_port, edit_session, first_run, frozen_smoke, i18n, ics_import, language_store, launcher, logging_config, models, nlp_parser, notification_service, packaging_tools, performance, product_info, recurrence, reminder_worker, runtime_config, runtime_diagnostics, services, startup_manager, streamlit_runner, third_party_notices, tools, tray_app, ui, verify_installer_failure, version, windows_app_registration
+映射不到发行版的第三方目录（人工复核）：numpy.libs, pandas.libs, pyarrow.libs, sitecustomize, tests_env
 随包分发的**打包器**运行时组件（不是运行时依赖，许可证见文末）：pyinstaller
-传递依赖中**未打进 bundle** 的包（因此未列清单，不计为分发内容）：altair, altgraph, attrs, backports.tarfile, charset_normalizer, exceptiongroup, httpx, importlib-metadata, importlib_metadata, importlib_resources, jeepney, jsonschema, jsonschema-specifications, macholib, more_itertools, narwhals, pefile, pyinstaller-hooks-contrib, pyobjc-core, pyobjc-framework-cocoa, pyobjc-framework-quartz, pyobjc-framework-security, pyobjc-framework-uniformtypeidentifiers, pyobjc-framework-webkit, python-xlib, qtpy, referencing, rpds-py, secretstorage, typing-extensions, winsdk
-打包器内部件/标准库（不算第三方）：VCRUNTIME140.dll, VCRUNTIME140_1.dll, __future__, _aix_support, _ast_unparse, _colorize, _compat_pickle, _distutils_hack, _opcode_metadata, _osx_support, _py_abc, _py_warnings…
+传递依赖中**未打进 bundle** 的包（因此未列清单，不计为分发内容）：altair, altgraph, attrs, backports.tarfile, charset_normalizer, exceptiongroup, importlib-metadata, importlib_metadata, importlib_resources, jeepney, jsonschema, jsonschema-specifications, macholib, more_itertools, narwhals, pefile, pyinstaller-hooks-contrib, pyobjc-core, pyobjc-framework-cocoa, pyobjc-framework-quartz, pyobjc-framework-security, pyobjc-framework-uniformtypeidentifiers, pyobjc-framework-webkit, python-xlib, qtpy, referencing, rpds-py, secretstorage, typing-extensions
+打包器内部件/标准库（不算第三方）：VCRUNTIME140.dll, VCRUNTIME140_1.dll, __future__, _aix_support, _colorize, _compat_pickle, _compression, _distutils_hack, _opcode_metadata, _osx_support, _py_abc, _pydatetime…
 
 ------------------------------------------------------------
 Python 运行时

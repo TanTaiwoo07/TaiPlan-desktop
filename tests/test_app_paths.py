@@ -29,9 +29,9 @@ import sys
 from importlib import metadata
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DIST = ROOT / "dist" / "TodoApp"
-DEFAULT_OUT = ROOT / "THIRD_PARTY_NOTICES.txt"
+DEFAULT_OUT = ROOT / "docs" / "THIRD_PARTY_NOTICES.txt"
 
 # 纯构建期依赖：**只有它们并不同时出现在 bundle 里**时才排除。
 # 注意 setuptools 不在其中：PyInstaller 会把 pkg_resources 打进 onedir，

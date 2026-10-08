@@ -17,9 +17,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 CJK = re.compile(r"[\u4e00-\u9fff]")
 
 WIDGETS = {

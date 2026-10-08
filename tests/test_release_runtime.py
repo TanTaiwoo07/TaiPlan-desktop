@@ -11,7 +11,7 @@ import zipfile
 from datetime import datetime, timedelta
 from pathlib import Path
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
 import ai_settings
 import app_paths
@@ -346,7 +346,7 @@ class VersionSourceTest(unittest.TestCase):
         self.assertNotIn("-dev", version.__version__)
 
     def test_no_hardcoded_version_string_in_app(self):
-        app_src = (Path(__file__).resolve().parent / "app.py").read_text(encoding="utf-8")
+        app_src = (Path(__file__).resolve().parent.parent / "app.py").read_text(encoding="utf-8")
         self.assertNotIn("0.1.0-dev", app_src)
 
 
@@ -358,7 +358,7 @@ class StartupOrderTest(unittest.TestCase):
     """
 
     def _assert_migration_first(self, rel):
-        lines = (Path(__file__).resolve().parent / rel).read_text(
+        lines = (Path(__file__).resolve().parent.parent / rel).read_text(
             encoding="utf-8").splitlines()
         init_at = next(i for i, l in enumerate(lines)
                        if l.strip().endswith("init_database()"))

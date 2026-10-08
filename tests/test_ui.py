@@ -21,9 +21,9 @@ import ui.theme as theme
 
 from streamlit.testing.v1 import AppTest
 
-import tests_env  # noqa: F401  必须早于项目模块导入（隔离数据目录）
+from tests import tests_env  # noqa: F401  必须早于项目模块导入（隔离数据目录）
 
-APP_PATH = Path(__file__).resolve().parent / "app.py"
+APP_PATH = Path(__file__).resolve().parent.parent / "app.py"
 
 
 class ThemeTokenTest(unittest.TestCase):
@@ -375,7 +375,7 @@ if __name__ == "__main__":
 class KeyboardShortcutTest(unittest.TestCase):
     """Ctrl+N 快捷键：JS 注入存在且幂等、挂载点在主入口。"""
 
-    BASE = Path(__file__).resolve().parent
+    BASE = Path(__file__).resolve().parent.parent
 
     def test_helper_exists_and_idempotent(self):
         src = io.open(self.BASE / "ui" / "components.py",

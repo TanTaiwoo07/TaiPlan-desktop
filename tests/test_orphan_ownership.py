@@ -15,7 +15,7 @@ import desktop_runtime
 import desktop_window
 import dynamic_port
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 
 
 class PublishedStateTest(unittest.TestCase):

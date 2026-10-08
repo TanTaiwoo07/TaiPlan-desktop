@@ -38,10 +38,10 @@ py -3.14 -m venv .venv
 
 ```bat
 :: everything
-.venv\Scripts\python.exe -m unittest discover -p "test_*.py"
+.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
 
 :: a single module
-.venv\Scripts\python.exe -m unittest test_services
+.venv\Scripts\python.exe -m unittest tests.test_worker
 ```
 
 Please keep the suite green. A change that makes a test weaker (skipping, deleting

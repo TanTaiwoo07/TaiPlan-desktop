@@ -36,7 +36,7 @@ Get-FileHash TaiPlan-Setup-0.1.2.exe -Algorithm SHA256
 输出应等于：
 
 ```
-16e5ca5313fd59e06930ff814cf44019f31ad698edebb9b6a22a5f895e7054d5
+44fbacc3f86aadf6828885c97ba741d6f339da410f00f88fbd392858b6160d04
 ```
 
 ---
@@ -106,7 +106,7 @@ Install: run `TaiPlan-Setup-0.1.2.exe` (per-user, no admin rights). Data lives i
 "unknown publisher"; choose "More info → Run anyway".
 
 Verify your download with `certutil -hashfile TaiPlan-Setup-0.1.2.exe SHA256`; it must
-match `16e5ca5313fd59e06930ff814cf44019f31ad698edebb9b6a22a5f895e7054d5`.
+match `44fbacc3f86aadf6828885c97ba741d6f339da410f00f88fbd392858b6160d04`.
 
 ---
 

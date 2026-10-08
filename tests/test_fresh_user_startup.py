@@ -22,9 +22,9 @@ import time
 import unittest
 from pathlib import Path
 
-import tests_env  # noqa: F401
+from tests import tests_env  # noqa: F401
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 EXE = ROOT / "dist" / "TaiPlan" / "TaiPlan.exe"
 
 
@@ -790,7 +790,7 @@ class StateConfigAllowlistTest(unittest.TestCase):
     SKIP = (".venv" + os.sep, "build" + os.sep, "dist" + os.sep, "release" + os.sep)
 
     def _sources(self):
-        root = Path(__file__).resolve().parent
+        root = Path(__file__).resolve().parent.parent
         for path in root.rglob("*.py"):
             text = str(path)
             if any(k in text for k in self.SKIP) or path.name.startswith("test_"):

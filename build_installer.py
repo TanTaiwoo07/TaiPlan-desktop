@@ -233,7 +233,7 @@ def scan_installer_inputs(iss_path: Path = ISS_FILE, dist_dir: Path = DIST_DIR):
         source = line.split(":", 1)[1].split(";")[0].strip().strip('"')
         allowed = (
             source.startswith("..\\dist\\TaiPlan")
-            or source in ("..\\RELEASE_NOTES.md", "..\\THIRD_PARTY_NOTICES.txt")
+            or source in ("..\\docs\\RELEASE_NOTES.md", "..\\docs\\THIRD_PARTY_NOTICES.txt")
         )
         if not allowed:
             problems.append(f"[Files] 含有非 dist 来源：{source}")
