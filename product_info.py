@@ -24,7 +24,7 @@ APP_DESCRIPTION_ZH = "\u4e00\u4e2a\u672c\u5730\u4f18\u5148\u7684\u4efb\u52a1\u4e
 APP_DESCRIPTION_EN = "A local-first task and time planning desktop app."
 
 # 尚未有真实仓库地址：不写假 URL（§11）
-APP_REPO_URL = ""
+APP_REPO_URL = "https://github.com/TanTaiwoo07/TaiPlan-desktop"
 
 __all__ = ["APP_NAME", "APP_DISPLAY_NAME", "APP_VERSION", "APP_AUTHOR", "APP_COPYRIGHT",
            "APP_TAGLINE", "APP_LICENSE", "APP_DESCRIPTION_ZH", "APP_DESCRIPTION_EN",

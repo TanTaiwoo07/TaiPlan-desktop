@@ -197,9 +197,10 @@ class ProductIdentityTest(unittest.TestCase):
 
         self.assertEqual(product_info.APP_VERSION, version.__version__)
 
-    def test_no_fake_repo_url(self):
-        """§11：没有真实仓库地址就不要写假的。"""
-        self.assertEqual(product_info.APP_REPO_URL, "")
+    def test_real_repo_url(self):
+        """§11（0.1.2 反转）：仓库已真实存在，必须是 TanTaiwoo07/TaiPlan-desktop。"""
+        self.assertEqual(product_info.APP_REPO_URL,
+                         "https://github.com/TanTaiwoo07/TaiPlan-desktop")
 
 
 if __name__ == "__main__":

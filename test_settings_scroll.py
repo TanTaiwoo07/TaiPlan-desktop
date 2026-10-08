@@ -241,7 +241,7 @@ class AboutTest(_Base):
         md = self.markdown_text(at)
         for needle in ("TaiPlan", "Tasks into time.", f"Version {version.__version__}",
                        "Designed & Developed by", "TaiWoo_Chen", "© 2026 TaiWoo_Chen",
-                       "MIT License", "GitHub repository — coming soon"):
+                       "MIT License", "https://github.com/TanTaiwoo07/TaiPlan-desktop"):
             self.assertIn(needle, md, f"About 缺少: {needle}")
 
     def test_taiwoo_chen_exact_spelling(self):
@@ -259,13 +259,20 @@ class AboutTest(_Base):
         src = io.open(ROOT / "app.py", encoding="utf-8-sig").read()
         self.assertIn("product_info.APP_AUTHOR", src, "作者应来自 product_info 单一来源")
 
-    def test_no_fake_github_url(self):
+    def test_repo_url_is_real(self):
+        """0.1.2 起：仓库真实存在，About 页必须给出可点击的真实 GitHub 链接。
+
+        历史语义（0.1.0–0.1.1）：仓库未建，禁止任何假 URL。
+        现在反转：必须是 TanTaiwoo07/TaiPlan-desktop，且 About 渲染走链接分支。
+        """
         import product_info
 
-        self.assertEqual(product_info.APP_REPO_URL, "")
-        for rel in ("app.py", "product_info.py"):
-            src = io.open(ROOT / rel, encoding="utf-8-sig").read()
-            self.assertNotIn("github.com/", src, f"{rel} 不应有假仓库 URL")
+        self.assertEqual(product_info.APP_REPO_URL,
+                         "https://github.com/TanTaiwoo07/TaiPlan-desktop")
+        # About 页的分支逻辑：有 URL → 链接；无 URL 才显示 coming soon
+        src = io.open(ROOT / "app.py", encoding="utf-8-sig").read()
+        self.assertIn('if product_info.APP_REPO_URL:', src)
+        self.assertIn('[GitHub]({product_info.APP_REPO_URL})', src)
 
 
 class HardcodedTextTest(_Base):
