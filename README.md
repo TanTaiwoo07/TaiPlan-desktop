@@ -1,5 +1,7 @@
 # TaiPlan
 
+![TaiPlan — Today view (light theme)](assets/promo_today_light.png)
+
 **Tasks into time.**
 
 A local-first task and time planning desktop app for Windows.
