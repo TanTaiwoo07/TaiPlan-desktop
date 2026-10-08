@@ -1,0 +1,96 @@
+{
+ "generated_at": "2026-10-05 10:14:58",
+ "frozen": false,
+ "samples": 7,
+ "seed_seconds": 2.41,
+ "operations": [
+  {
+   "operation": "page_today_fetch",
+   "median_ms": 32.48,
+   "p95_ms": 37.01,
+   "min_ms": 31.04,
+   "sample_count": 7,
+   "sql_median": 6
+  },
+  {
+   "operation": "page_inbox_fetch",
+   "median_ms": 6.08,
+   "p95_ms": 8.74,
+   "min_ms": 5.53,
+   "sample_count": 7,
+   "sql_median": 1
+  },
+  {
+   "operation": "page_completed_fetch",
+   "median_ms": 10.8,
+   "p95_ms": 11.99,
+   "min_ms": 10.37,
+   "sample_count": 7,
+   "sql_median": 2
+  },
+  {
+   "operation": "page_upcoming_fetch",
+   "median_ms": 183.34,
+   "p95_ms": 195.28,
+   "min_ms": 175.53,
+   "sample_count": 7,
+   "sql_median": 25
+  },
+  {
+   "operation": "page_month_items",
+   "median_ms": 29.67,
+   "p95_ms": 32.04,
+   "min_ms": 28.91,
+   "sample_count": 7,
+   "sql_median": 5
+  },
+  {
+   "operation": "page_week_items",
+   "median_ms": 26.93,
+   "p95_ms": 29.72,
+   "min_ms": 25.64,
+   "sample_count": 7,
+   "sql_median": 5
+  },
+  {
+   "operation": "recurrence_project_month",
+   "median_ms": 0.06,
+   "p95_ms": 0.1,
+   "min_ms": 0.06,
+   "sample_count": 7,
+   "sql_median": 0
+  },
+  {
+   "operation": "calendar_events_month",
+   "median_ms": 30.71,
+   "p95_ms": 34.74,
+   "min_ms": 29.11,
+   "sample_count": 7,
+   "sql_median": 5
+  },
+  {
+   "operation": "create_task",
+   "median_ms": 15.89,
+   "p95_ms": 49.97,
+   "min_ms": 15.13,
+   "sample_count": 7,
+   "sql_median": 3
+  },
+  {
+   "operation": "complete_task",
+   "median_ms": 41.96,
+   "p95_ms": 45.72,
+   "min_ms": 39.03,
+   "sample_count": 7,
+   "sql_median": 8
+  },
+  {
+   "operation": "edit_task",
+   "median_ms": 47.0,
+   "p95_ms": 49.98,
+   "min_ms": 41.69,
+   "sample_count": 7,
+   "sql_median": 8
+  }
+ ]
+}

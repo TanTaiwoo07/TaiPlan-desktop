@@ -1,0 +1,26 @@
+# TaiPlan 直接依赖（第 14 阶段锁定）
+#
+# 规则：项目里直接 import 的第三方包必须出现在这里，不能依赖「碰巧被其他库装上」。
+# 安装：.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# --- 界面 / 日历 ---
+streamlit==1.64.0
+streamlit-calendar==1.4.0
+
+# --- 桌面窗口 / 托盘 / 图标 ---
+pywebview
+pystray
+Pillow
+
+# --- 网络（AI Provider）---
+requests
+
+# --- 凭据存储（API Key 存 Windows 凭据管理器）---
+keyring
+
+# --- Windows 通知：可选 provider ---
+# 至少需要一个，程序会按 toaster → powershell(WinRT) → winotify 顺序自动降级。
+# 未安装任何 provider 时仍可运行，只是没有系统通知。
+winotify
+# toasted 依赖 winsdk，当前 Python 3.14 没有可用 wheel，暂不列入（未安装也能正常降级）：
+# toasted

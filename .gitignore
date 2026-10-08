@@ -1,0 +1,53 @@
+# ---- Python / 环境 ----
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ---- 构建与发布产物 ----
+build/
+dist/
+release/
+benchmarks/dist_after.json
+
+# ---- 开发/走查期间的临时工作区 ----
+.zwork_todo_build/
+.zworktodobuild/
+.zwork/
+shots_w1/
+shots_w3/
+shots_w35/
+shots_*/
+build_logs/
+logs/
+
+# ---- 运行时状态与数据（绝不进入仓库）----
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+runtime_port.json
+migration_state.json
+migration_complete.json
+state/
+
+# ---- 日志 ----
+*.log
+
+# ---- 本机个人配置 / 凭据 / 备份 ----
+.env
+*.local.json
+ai_config.local.json
+*credential*
+*secret*
+*Backup*/
+*backup*/
+*.sha256
+
+# ---- 编辑器 / 系统 ----
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

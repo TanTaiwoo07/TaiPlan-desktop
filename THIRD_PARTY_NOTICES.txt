@@ -1,0 +1,236 @@
+THIRD PARTY NOTICES
+===================
+
+TaiPlan 分发了以下第三方组件。本清单以 **dist/TaiPlan/_internal 的实际内容**为准
+（即真正打进安装包、随程序分发的东西），版本与许可证全部读取自本机这些发行版的
+metadata（importlib.metadata / *.dist-info/METADATA），未做任何推测。
+
+生成规则：
+  1. 顶层内容取自 dist/TaiPlan/_internal（真实 bundle 事实）；
+  2. 顶层包名经 importlib.metadata.packages_distributions() 映射到发行版；
+  3. 只列确实在 bundle 里的发行版；纯构建依赖（PyInstaller 等）不列为运行时依赖；
+  4. Python 标准库与打包器内部件不算第三方组件（见文末说明）；
+  5. 映射不到发行版的内容集中列在"未解析"一节，不静默丢弃。
+
+若与上游项目声明不一致，以上游为准。
+
+
+anyio               4.15.1
+                    许可证 : MIT
+                    主页   : https://anyio.readthedocs.io/en/latest/
+
+bottle              0.13.4
+                    许可证 : MIT
+                    主页   : http://bottlepy.org/
+
+certifi             2026.7.22
+                    许可证 : MPL-2.0
+                    主页   : https://github.com/certifi/python-certifi
+
+cffi                2.1.1
+                    许可证 : MIT-0
+                    主页   : https://cffi.readthedocs.io/
+
+charset-normalizer  3.5.2
+                    许可证 : MIT
+                    主页   : https://github.com/jawah/charset_normalizer/blob/master/CHANGELOG.md
+
+click               8.5.0
+                    许可证 : BSD-3-Clause
+                    主页   : https://click.palletsprojects.com/page/changes/
+
+clr_loader          0.3.1
+                    许可证 : 见上游仓库中的 LICENSE 文件（metadata 未给 SPDX 标识）
+                    主页   : https://github.com/pythonnet/clr-loader
+
+h11                 0.16.0
+                    许可证 : MIT
+                    主页   : https://github.com/python-hyper/h11
+
+httptools           0.8.0
+                    许可证 : MIT
+                    主页   : https://github.com/MagicStack/httptools
+
+idna                3.20
+                    许可证 : BSD-3-Clause
+                    主页   : https://github.com/kjd/idna/blob/master/HISTORY.md
+
+itsdangerous        2.2.0
+                    许可证 : BSD License
+                    主页   : https://itsdangerous.palletsprojects.com/changes/
+
+jaraco.classes      3.4.0
+                    许可证 : MIT License
+                    主页   : https://github.com/jaraco/jaraco.classes
+
+jaraco.context      6.1.2
+                    许可证 : MIT
+                    主页   : https://github.com/jaraco/jaraco.context
+
+jaraco.functools    4.6.0
+                    许可证 : MIT
+                    主页   : https://github.com/jaraco/jaraco.functools
+
+Jinja2              3.1.6
+                    许可证 : BSD License
+                    主页   : https://jinja.palletsprojects.com/changes/
+
+keyring             25.7.0
+                    许可证 : MIT
+                    主页   : https://github.com/jaraco/keyring
+
+MarkupSafe          3.0.3
+                    许可证 : BSD-3-Clause
+                    主页   : https://palletsprojects.com/donate
+
+more-itertools      11.1.0
+                    许可证 : MIT
+                    主页   : https://more-itertools.readthedocs.io/en/stable/
+
+numpy               2.5.3
+                    许可证 : BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0
+                    主页   : https://numpy.org
+
+packaging           26.3
+                    许可证 : Apache-2.0 OR BSD-2-Clause
+                    主页   : https://packaging.pypa.io/
+
+pandas              3.0.6
+                    许可证 : BSD License
+                    主页   : https://pandas.pydata.org
+
+pillow              12.3.0
+                    许可证 : MIT-CMU
+                    主页   : https://pillow.readthedocs.io/en/stable/releasenotes/index.html
+
+protobuf            7.36.2
+                    许可证 : 3-Clause BSD License
+                    主页   : https://developers.google.com/protocol-buffers/
+
+proxy_tools         0.1.0
+                    许可证 : MIT
+                    主页   : http://github.com/jtushman/proxy_tools
+
+pyarrow             25.0.1
+                    许可证 : Apache-2.0
+                    主页   : https://arrow.apache.org/
+
+pycparser           3.0
+                    许可证 : BSD-3-Clause
+                    主页   : https://github.com/eliben/pycparser
+
+pydeck              0.9.3
+                    许可证 : Apache License 2.0
+                    主页   : https://github.com/visgl/deck.gl/tree/master/bindings/pydeck
+
+pystray             0.19.5
+                    许可证 : LGPLv3
+                    主页   : https://github.com/moses-palmer/pystray
+
+python-dateutil     2.9.0.post0
+                    许可证 : Dual License
+                    主页   : https://github.com/dateutil/dateutil
+
+python-multipart    0.0.32
+                    许可证 : Apache Software License
+                    主页   : https://github.com/Kludex/python-multipart
+
+pythonnet           3.2.0
+                    许可证 : MIT
+                    主页   : https://pythonnet.github.io/
+
+pywebview           6.2.1
+                    许可证 : BSD License
+                    主页   : https://pywebview.flowrl.com/
+
+pywin32-ctypes      0.2.3
+                    许可证 : BSD-3-Clause
+                    主页   : https://github.com/enthought/pywin32-ctypes
+
+requests            2.34.2
+                    许可证 : Apache-2.0
+                    主页   : https://requests.readthedocs.io
+
+setuptools          84.0.0
+                    许可证 : MIT
+                    主页   : https://github.com/pypa/setuptools
+
+six                 1.17.0
+                    许可证 : MIT
+                    主页   : https://github.com/benjaminp/six
+
+starlette           1.7.0
+                    许可证 : BSD-3-Clause
+                    主页   : https://github.com/Kludex/starlette
+
+streamlit           1.64.0
+                    许可证 : Apache-2.0
+                    主页   : https://streamlit.io
+
+streamlit-calendar  1.4.0
+                    许可证 : Apache-2.0
+                    主页   : https://github.com/im-perativa/streamlit-calendar
+
+toasted             0.2.0
+                    许可证 : MIT License
+                    主页   : https://github.com/ysfchn/toasted
+
+toml                0.10.2
+                    许可证 : MIT
+                    主页   : https://github.com/uiri/toml
+
+typing_extensions   4.16.0
+                    许可证 : PSF-2.0
+                    主页   : https://github.com/python/typing_extensions/issues
+
+tzdata              2026.4
+                    许可证 : Apache-2.0
+                    主页   : https://github.com/python/tzdata
+
+urllib3             2.8.0
+                    许可证 : MIT
+                    主页   : https://github.com/urllib3/urllib3/blob/main/CHANGES.rst
+
+uvicorn             0.54.0
+                    许可证 : BSD-3-Clause
+                    主页   : https://uvicorn.dev/release-notes
+
+watchdog            6.0.0
+                    许可证 : Apache-2.0
+                    主页   : https://github.com/gorakhargosh/watchdog
+
+websockets          16.1.1
+                    许可证 : BSD-3-Clause
+                    主页   : https://github.com/python-websockets/websockets
+
+winotify            1.1.0
+                    许可证 : MIT
+                    主页   : https://github.com/versa-syahptr/winotify
+
+------------------------------------------------------------
+未解析 / 未列入（保证不漏也不多）
+------------------------------------------------------------
+bundle 顶层名：107 个，映射到发行版：49 个
+事实来源：PYZ-00.toc（223 个顶层模块） ∪ _internal 顶层目录
+项目自有资源（非第三方，不计入）：ai_client, ai_settings, analyze_dist, app, app_metadata, app_paths, assets, benchmark, build, build_installer, build_release, calendar_adapter, calendar_settings, calendar_view, config, config_store, create_shortcut, data_backup, data_dir_migration, data_migration, database, datetime_parser, desktop_notifier, desktop_runtime, desktop_window, dynamic_port, edit_session, first_run, frozen_smoke, i18n, ics_import, language_store, launcher, logging_config, models, nlp_parser, notification_service, packaging_tools, performance, product_info, recurrence, reminder_worker, runtime_config, runtime_diagnostics, services, startup_manager, streamlit_runner, tests_env, third_party_notices, tools, tray_app, ui, verify_installer_failure, version, windows_app_registration
+映射不到发行版的第三方目录（人工复核）：numpy.libs, pandas.libs, pyarrow.libs
+随包分发的**打包器**运行时组件（不是运行时依赖，许可证见文末）：pyinstaller
+传递依赖中**未打进 bundle** 的包（因此未列清单，不计为分发内容）：altair, altgraph, attrs, backports.tarfile, charset_normalizer, exceptiongroup, httpx, importlib-metadata, importlib_metadata, importlib_resources, jeepney, jsonschema, jsonschema-specifications, macholib, more_itertools, narwhals, pefile, pyinstaller-hooks-contrib, pyobjc-core, pyobjc-framework-cocoa, pyobjc-framework-quartz, pyobjc-framework-security, pyobjc-framework-uniformtypeidentifiers, pyobjc-framework-webkit, python-xlib, qtpy, referencing, rpds-py, secretstorage, typing-extensions, winsdk
+打包器内部件/标准库（不算第三方）：VCRUNTIME140.dll, VCRUNTIME140_1.dll, __future__, _aix_support, _ast_unparse, _colorize, _compat_pickle, _distutils_hack, _opcode_metadata, _osx_support, _py_abc, _py_warnings…
+
+------------------------------------------------------------
+Python 运行时
+------------------------------------------------------------
+本程序内嵌 Python 运行时。Python 由 Python Software Foundation 提供，
+许可证为 PSF License Agreement。
+https://docs.python.org/3/license.html
+
+------------------------------------------------------------
+打包工具（非运行时依赖）
+------------------------------------------------------------
+本程序使用 PyInstaller 打包。PyInstaller 的引导程序（bootloader）按 GPL 2.0 提供，
+并附有允许分发打包产物的例外条款（Bootloader Exception）。
+PyInstaller 本身不随安装包作为可导入的库分发，因此不计入上面的依赖清单。
+https://pyinstaller.org/en/stable/license.html
+
+完整的分发依赖清单亦见安装目录下的 _internal 文件夹中各 *.dist-info/METADATA。
