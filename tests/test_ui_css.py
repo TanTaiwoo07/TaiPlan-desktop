@@ -17,7 +17,7 @@ os.environ.setdefault("TODO_APP_DATA_DIR", tempfile.mkdtemp(prefix="testcss_"))
 os.environ.setdefault("TODO_APP_LEGACY_DIR", tempfile.mkdtemp(prefix="testcssl_"))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import ui.theme as theme  # noqa: E402
+from taiplan.ui import theme as theme  # noqa: E402
 
 STATES = [(True, "dark"), (True, "light"), (False, "dark"), (False, "light")]
 

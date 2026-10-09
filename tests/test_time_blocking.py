@@ -11,7 +11,7 @@ import tempfile
 import unittest
 from datetime import datetime, timedelta
 
-import database
+from taiplan import database
 
 
 class _TempDb(unittest.TestCase):
@@ -32,20 +32,20 @@ class _TempDb(unittest.TestCase):
 class DurationTest(_TempDb):
 
     def test_create_with_duration(self):
-        import services
+        from taiplan import services
         services.create_task("高数", date="2026-10-05", time="14:00", duration_minutes=90)
         item = services.get_items_for_range("2026-10-05", "2026-10-05")[0]
         self.assertEqual(item.duration_minutes, 90)
 
     def test_duration_rejected_without_time(self):
         """全天任务不能有 duration。"""
-        import services
+        from taiplan import services
         services.create_task("交作业", date="2026-10-05", duration_minutes=60)
         item = services.get_items_for_range("2026-10-05", "2026-10-05")[0]
         self.assertIsNone(item.duration_minutes)
 
     def test_duration_range_validation(self):
-        import services
+        from taiplan import services
         with self.assertRaises(ValueError):
             services.create_task("x", date="2026-10-05", time="10:00", duration_minutes=1)
         with self.assertRaises(ValueError):
@@ -53,7 +53,7 @@ class DurationTest(_TempDb):
 
     def test_legacy_default_is_not_persisted(self):
         """旧任务 duration_minutes 仍为 NULL（不因显示而写库）。"""
-        import services
+        from taiplan import services
         services.create_task("旧任务", date="2026-10-05", time="09:00")
         task = [t for t in services.get_tasks() if t["title"] == "旧任务"][0]
         self.assertIsNone(task["duration_minutes"])
@@ -64,7 +64,7 @@ class DurationTest(_TempDb):
 class DragResizeTest(_TempDb):
 
     def test_plain_task_drag_changes_date_time(self):
-        import services
+        from taiplan import services
         services.create_task("高数", date="2026-10-05", time="14:30", duration_minutes=90)
         tid = [t["id"] for t in services.get_tasks()][0]
         services.move_plain_task(tid, new_date="2026-10-06", new_time="16:00",
@@ -74,14 +74,14 @@ class DragResizeTest(_TempDb):
         self.assertEqual(task["time"], "16:00")
 
     def test_plain_task_resize(self):
-        import services
+        from taiplan import services
         services.create_task("高数", date="2026-10-05", time="14:30", duration_minutes=90)
         tid = [t["id"] for t in services.get_tasks()][0]
         services.move_plain_task(tid, new_duration_minutes=180)
         self.assertEqual(services.get_task(tid)["duration_minutes"], 180)
 
     def test_timed_to_all_day(self):
-        import services
+        from taiplan import services
         services.create_task("高数", date="2026-10-05", time="14:30", duration_minutes=90)
         tid = [t["id"] for t in services.get_tasks()][0]
         services.move_plain_task(tid, new_date="2026-10-07", clear_time=True)
@@ -91,7 +91,7 @@ class DragResizeTest(_TempDb):
         self.assertIsNone(task["duration_minutes"])
 
     def test_all_day_to_timed_uses_default(self):
-        import services
+        from taiplan import services
         services.create_task("交作业", date="2026-10-05")
         tid = [t["id"] for t in services.get_tasks()][0]
         services.move_plain_task(tid, new_date="2026-10-05", new_time="14:00")
@@ -103,14 +103,14 @@ class DragResizeTest(_TempDb):
 class OccurrenceOverrideTest(_TempDb):
 
     def _daily(self, title="每天吃药", date="2026-10-05", time="09:00"):
-        import services
+        from taiplan import services
         services.create_task(title, date=date, time=time, duration_minutes=30,
                              is_recurring=True, recurrence_frequency="daily",
                              recurrence_interval=1)
         return [t["id"] for t in services.get_tasks() if t["title"] == title][0]
 
     def test_override_moves_occurrence_to_new_date(self):
-        import services
+        from taiplan import services
         tid = self._daily()
         services.set_occurrence_override(tid, "2026-10-05T09:00",
                                          date="2026-10-06", time="14:00")
@@ -121,7 +121,7 @@ class OccurrenceOverrideTest(_TempDb):
         self.assertEqual(moved[0].time, "14:00")
 
     def test_original_date_no_longer_shows(self):
-        import services
+        from taiplan import services
         tid = self._daily()
         services.set_occurrence_override(tid, "2026-10-05T09:00", date="2026-10-06", time="14:00")
         same_day = [i for i in services.get_items_for_range("2026-10-05", "2026-10-05")
@@ -129,7 +129,7 @@ class OccurrenceOverrideTest(_TempDb):
         self.assertEqual(same_day, [])
 
     def test_override_keeps_original_occurrence_key(self):
-        import services
+        from taiplan import services
         tid = self._daily()
         services.set_occurrence_override(tid, "2026-10-05T09:00", date="2026-10-08", time="11:00")
         rows = services.get_occurrence_override(tid, "2026-10-05T09:00")
@@ -142,7 +142,7 @@ class OccurrenceOverrideTest(_TempDb):
         self.assertEqual(other[0].time, "09:00")
 
     def test_override_duration_only(self):
-        import services
+        from taiplan import services
         tid = self._daily()
         services.set_occurrence_override(tid, "2026-10-06T09:00", duration_minutes=90)
         item = [i for i in services.get_items_for_range("2026-10-06", "2026-10-06")
@@ -151,7 +151,7 @@ class OccurrenceOverrideTest(_TempDb):
         self.assertEqual(item.duration_minutes, 90)
 
     def test_completed_override_still_completed_on_new_date(self):
-        import services
+        from taiplan import services
         tid = self._daily()
         services.set_occurrence_override(tid, "2026-10-05T09:00", date="2026-10-06", time="14:00")
         services.complete_occurrence(tid, "2026-10-05T09:00", True)
@@ -160,7 +160,7 @@ class OccurrenceOverrideTest(_TempDb):
         self.assertTrue(item.is_completed)
 
     def test_cancelled_override_not_shown(self):
-        import services
+        from taiplan import services
         tid = self._daily()
         services.set_occurrence_override(tid, "2026-10-05T09:00", date="2026-10-06", time="14:00")
         services.cancel_occurrence(tid, "2026-10-05T09:00")
@@ -169,7 +169,7 @@ class OccurrenceOverrideTest(_TempDb):
         self.assertEqual(shown, [])
 
     def test_clear_override_restores_original(self):
-        import services
+        from taiplan import services
         tid = self._daily()
         services.set_occurrence_override(tid, "2026-10-05T09:00", date="2026-10-06", time="14:00")
         services.clear_occurrence_override(tid, "2026-10-05T09:00")
@@ -182,7 +182,7 @@ class OccurrenceOverrideTest(_TempDb):
 class SeriesChangeTest(_TempDb):
 
     def test_series_move_shifts_anchor(self):
-        import services
+        from taiplan import services
         # 每周一 09:00
         services.create_task("周会", date="2026-10-05", time="09:00", duration_minutes=60,
                              is_recurring=True, recurrence_frequency="weekly",
@@ -199,7 +199,7 @@ class SeriesChangeTest(_TempDb):
         self.assertEqual(len(nxt), 1)
 
     def test_series_resize_changes_master_duration(self):
-        import services
+        from taiplan import services
         services.create_task("周会", date="2026-10-05", time="09:00", duration_minutes=60,
                              is_recurring=True, recurrence_frequency="weekly",
                              recurrence_interval=1)
@@ -211,7 +211,7 @@ class SeriesChangeTest(_TempDb):
         self.assertEqual(nxt.duration_minutes, 90)
 
     def test_series_change_keeps_existing_override(self):
-        import services
+        from taiplan import services
         services.create_task("每天吃药", date="2026-10-05", time="09:00", duration_minutes=30,
                              is_recurring=True, recurrence_frequency="daily", recurrence_interval=1)
         tid = [t["id"] for t in services.get_tasks()][0]
@@ -226,20 +226,20 @@ class SeriesChangeTest(_TempDb):
 class ConflictTest(_TempDb):
 
     def test_touching_boundaries_not_conflict(self):
-        import services
+        from taiplan import services
         services.create_task("A", date="2026-10-05", time="14:00", duration_minutes=60)
         conflicts = services.detect_time_conflicts("2026-10-05", "15:00", 60)
         self.assertEqual(conflicts, [])
 
     def test_overlapping_is_conflict(self):
-        import services
+        from taiplan import services
         services.create_task("项目会议", date="2026-10-05", time="15:30", duration_minutes=90)
         conflicts = services.detect_time_conflicts("2026-10-05", "15:00", 60)
         self.assertEqual(len(conflicts), 1)
         self.assertEqual(conflicts[0].title, "项目会议")
 
     def test_completed_not_counted(self):
-        import services
+        from taiplan import services
         services.create_task("已完成", date="2026-10-05", time="15:30", duration_minutes=60)
         tid = [t["id"] for t in services.get_tasks()][0]
         services.toggle_task(tid, True)
@@ -247,14 +247,14 @@ class ConflictTest(_TempDb):
         self.assertEqual(conflicts, [])
 
     def test_recurring_occurrence_participates(self):
-        import services
+        from taiplan import services
         services.create_task("每天吃药", date="2026-10-05", time="15:30", duration_minutes=30,
                              is_recurring=True, recurrence_frequency="daily", recurrence_interval=1)
         conflicts = services.detect_time_conflicts("2026-10-05", "15:00", 60)
         self.assertEqual(len(conflicts), 1)
 
     def test_cancelled_occurrence_excluded(self):
-        import services
+        from taiplan import services
         services.create_task("每天吃药", date="2026-10-05", time="15:30", duration_minutes=30,
                              is_recurring=True, recurrence_frequency="daily", recurrence_interval=1)
         tid = [t["id"] for t in services.get_tasks()][0]
@@ -263,7 +263,7 @@ class ConflictTest(_TempDb):
         self.assertEqual(conflicts, [])
 
     def test_self_excluded(self):
-        import services
+        from taiplan import services
         services.create_task("A", date="2026-10-05", time="15:00", duration_minutes=60)
         tid = [t["id"] for t in services.get_tasks()][0]
         conflicts = services.detect_time_conflicts(
@@ -271,7 +271,7 @@ class ConflictTest(_TempDb):
         self.assertEqual(conflicts, [])
 
     def test_override_occurrence_participates_on_new_date(self):
-        import services
+        from taiplan import services
         services.create_task("每天吃药", date="2026-10-05", time="09:00", duration_minutes=30,
                              is_recurring=True, recurrence_frequency="daily", recurrence_interval=1)
         tid = [t["id"] for t in services.get_tasks()][0]
@@ -283,14 +283,14 @@ class ConflictTest(_TempDb):
 class NlpDurationTest(unittest.TestCase):
 
     def test_hours_suffix(self):
-        import nlp_parser
+        from taiplan import nlp_parser
         p = nlp_parser.parse_quick_task("下午3点开会2小时")
         self.assertEqual(p.title, "开会")
         self.assertEqual(p.time, "15:00")
         self.assertEqual(p.duration_minutes, 120)
 
     def test_range_expression(self):
-        import nlp_parser
+        from taiplan import nlp_parser
         now = datetime(2026, 10, 4, 8, 0)
         p = nlp_parser.parse_quick_task("明天9点到10点上课", now=now)
         self.assertEqual(p.title, "上课")
@@ -299,25 +299,25 @@ class NlpDurationTest(unittest.TestCase):
         self.assertEqual(p.date, "2026-10-05")
 
     def test_pm_range_with_half(self):
-        import nlp_parser
+        from taiplan import nlp_parser
         p = nlp_parser.parse_quick_task("晚上8点到9点半学习")
         self.assertEqual(p.title, "学习")
         self.assertEqual(p.time, "20:00")
         self.assertEqual(p.duration_minutes, 90)
 
     def test_half_hour_word(self):
-        import nlp_parser
+        from taiplan import nlp_parser
         p = nlp_parser.parse_quick_task("下午3点半小时复盘")
         self.assertEqual(p.time, "15:00")
         self.assertEqual(p.duration_minutes, 30)
 
     def test_minutes_word(self):
-        import nlp_parser
+        from taiplan import nlp_parser
         p = nlp_parser.parse_quick_task("上午10点站会45分钟")
         self.assertEqual(p.duration_minutes, 45)
 
     def test_no_duration_returns_none(self):
-        import nlp_parser
+        from taiplan import nlp_parser
         p = nlp_parser.parse_quick_task("明天下午3点开会")
         self.assertIsNone(p.duration_minutes)
 

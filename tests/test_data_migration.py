@@ -10,8 +10,8 @@ from unittest import mock
 
 from tests import tests_env  # noqa: F401
 
-import app_paths
-import data_migration
+from taiplan import app_paths
+from taiplan import data_migration
 
 
 def _make_legacy_db(path: Path, titles=("旧任务A", "旧任务B")):

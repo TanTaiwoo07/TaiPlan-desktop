@@ -18,12 +18,12 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import app_metadata
+from taiplan import app_metadata
 import build_installer
-import desktop_runtime
+from taiplan import desktop_runtime
 import main as main_module
-import startup_manager
-import version
+from taiplan import startup_manager
+from taiplan import version
 
 ROOT = Path(__file__).resolve().parent.parent
 ISS = ROOT / "installer" / "TaiPlan.iss"
@@ -258,7 +258,7 @@ class UserDataSafetyTest(unittest.TestCase):
     def test_installer_never_installs_dev_scripts(self):
         files = iss_section("Files").lower()
         for bad in ("start_todo.bat", "start_todo_silent.vbs", "requirements.txt",
-                    "*.py", "launcher.py", "desktop_runtime.py"):
+                    "*.py", "taiplan/launcher.py", "taiplan/desktop_runtime.py"):
             self.assertNotIn(bad, files)
 
     def test_uninstall_stops_running_app_first(self):
@@ -337,7 +337,7 @@ class ShutdownSemanticsTest(unittest.TestCase):
 
     def test_lock_probe_does_not_listen(self):
         """bind 探测不能 listen（不得污染 backlog、不得影响真实 runtime 行为）。"""
-        src = io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+        src = io.open(ROOT / "taiplan" / "desktop_runtime.py", encoding="utf-8").read()
         block = src.split("def is_runtime_lock_held")[1].split("\ndef ")[0]
         self.assertNotIn("listen(", block)
         self.assertIn("bind(", block)
@@ -429,8 +429,8 @@ class ShutdownSemanticsTest(unittest.TestCase):
                                return_value=fake_lock), \
                 mock.patch.object(runtime, "_start_ipc_server", return_value=False), \
                 mock.patch.object(runtime, "cleanup") as cleanup, \
-                mock.patch("database.init_database") as init_db, \
-                mock.patch("first_run.run_first_run") as first_run:
+                mock.patch("taiplan.database.init_database") as init_db, \
+                mock.patch("taiplan.first_run.run_first_run") as first_run:
             self.assertFalse(runtime.start())
         self.assertIsNotNone(runtime.start_error)
         cleanup.assert_called_once()
@@ -450,7 +450,7 @@ class ShutdownSemanticsTest(unittest.TestCase):
 
     def test_no_webbrowser_fallback_code(self):
         """第二实例在控制通道不可用时绝不能打开浏览器。"""
-        src = io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+        src = io.open(ROOT / "taiplan" / "desktop_runtime.py", encoding="utf-8").read()
         code = "\n".join(line for line in src.splitlines()
                          if not line.strip().startswith("#"))
         self.assertNotIn("webbrowser.open", code)
@@ -458,7 +458,7 @@ class ShutdownSemanticsTest(unittest.TestCase):
 
     def test_cleanup_releases_lock_after_children(self):
         """顺序契约：lock/IPC socket 必须在 worker / tray / Streamlit 之后释放。"""
-        src = io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+        src = io.open(ROOT / "taiplan" / "desktop_runtime.py", encoding="utf-8").read()
         block = src.split("def cleanup(self)")[1]
         idx_worker = block.find("self.worker.stop()")
         idx_tray = block.find("self.tray.stop()")
@@ -473,7 +473,7 @@ class ShutdownSemanticsTest(unittest.TestCase):
 
     def test_main_exits_nonzero_on_start_error(self):
         src = io.open(ROOT / "main.py", encoding="utf-8").read() + \
-            io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+            io.open(ROOT / "taiplan" / "desktop_runtime.py", encoding="utf-8").read()
         self.assertIn("runtime.start_error", src)
         self.assertIn("SystemExit(2)", src)
 

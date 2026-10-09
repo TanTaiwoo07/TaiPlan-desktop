@@ -1,32 +1,32 @@
 import streamlit as st
 
-import language_store
-import product_info
-from i18n import (LANGUAGE_EN_US, LANGUAGE_SYSTEM,
+from taiplan import language_store
+from taiplan import product_info
+from taiplan.i18n import (LANGUAGE_EN_US, LANGUAGE_SYSTEM,
                   LANGUAGE_ZH_CN, dates, get_language, t)
 from datetime import date, time
 import json
 
-from database import init_database
-import database
-import services
-import calendar_view
-import edit_session
-import nlp_parser
-import datetime_parser
-import notification_service as notif
-import ui
-import ui.components as ui_components
-import ui.icons as ui_icons
-import ui.layout as ui_layout
-import ui.theme as ui_theme
-import app_metadata
-import app_paths
-import data_backup
-import ics_import
-import logging_config
-import runtime_diagnostics
-import version
+from taiplan.database import init_database
+from taiplan import database
+from taiplan import services
+from taiplan import calendar_view
+from taiplan import edit_session
+from taiplan import nlp_parser
+from taiplan import datetime_parser
+from taiplan import notification_service as notif
+from taiplan import ui
+from taiplan.ui import components as ui_components
+from taiplan.ui import icons as ui_icons
+from taiplan.ui import layout as ui_layout
+from taiplan.ui import theme as ui_theme
+from taiplan import app_metadata
+from taiplan import app_paths
+from taiplan import data_backup
+from taiplan import ics_import
+from taiplan import logging_config
+from taiplan import runtime_diagnostics
+from taiplan import version
 
 PRIORITY_OPTIONS = ["低", "普通", "紧急"]
 PRIORITY_MAP = {"低": "low", "普通": "normal", "紧急": "urgent"}
@@ -35,7 +35,7 @@ PRIORITY_LABEL = {"low": "低", "normal": "普通", "urgent": "🔴 紧急"}
 
 def _duration_label_for(minutes):
     """把分钟数映射为持续时间下拉项文案。"""
-    from calendar_settings import DURATION_LABELS
+    from taiplan.calendar_settings import DURATION_LABELS
     if minutes is None:
         minutes = 60
     return DURATION_LABELS.get(int(minutes), "自定义")
@@ -43,7 +43,7 @@ def _duration_label_for(minutes):
 
 def _duration_minutes_from(label, custom_value=None):
     """把下拉项文案（或自定义值）映射回分钟数。"""
-    from calendar_settings import DURATION_LABELS
+    from taiplan.calendar_settings import DURATION_LABELS
     if label == "自定义":
         try:
             return int(custom_value)
@@ -57,7 +57,7 @@ def _duration_minutes_from(label, custom_value=None):
 
 def _duration_widget(key_prefix, default_minutes=60):
     """渲染持续时间选择控件（仅在有时间时调用）。返回分钟数。"""
-    from calendar_settings import DURATION_CHOICES, DURATION_LABELS
+    from taiplan.calendar_settings import DURATION_CHOICES, DURATION_LABELS
     labels = [DURATION_LABELS[m] for m in DURATION_CHOICES] + ["自定义"]
     current = _duration_label_for(default_minutes)
     key = f"{key_prefix}_minutes"
@@ -135,7 +135,7 @@ def _duration_value_label(value):
     """时长下拉的显示标签（取值仍为中文标签/自定义，持久化语义不变）。"""
     global _DURATION_VALUE_LABELS
     if not _DURATION_VALUE_LABELS:
-        from calendar_settings import DURATION_CHOICES, DURATION_LABELS
+        from taiplan.calendar_settings import DURATION_CHOICES, DURATION_LABELS
 
         for _m in DURATION_CHOICES:
             _DURATION_VALUE_LABELS[DURATION_LABELS[_m]] = _m
@@ -227,7 +227,7 @@ def _default_ai_config():
     # 第 16 阶段 L 节：AI 依赖惰性导入——普通 Todo 页面冷启动不再拉起
     # requests / urllib3 / keyring（只在打开 AI 设置或真的走 AI 时才需要）。
     """从持久化文件加载 AI 配置，并从 keyring 读取当前 provider 的 API Key。"""
-    import ai_settings
+    from taiplan import ai_settings
     cfg, status = ai_settings.load_config()
     result = {
         "enabled": bool(cfg.get("enabled", False)),
@@ -262,7 +262,7 @@ def _get_ai_config():
 
 
 def _build_ai_client():
-    from ai_client import AIClient, AIConfig
+    from taiplan.ai_client import AIClient, AIConfig
 
     cfg = _get_ai_config()
     # 用关键字参数构造 AIConfig，避免字段顺序变更导致错位
@@ -826,7 +826,7 @@ def _occurrence_scope_hint(occurrence_key):
     """「仅修改这一次」的说明文案（带上这一次的日期/时间）。"""
     label = str(occurrence_key)
     try:
-        import recurrence
+        from taiplan import recurrence
 
         parsed = recurrence.parse_occurrence_key(occurrence_key)
         if parsed:
@@ -1111,8 +1111,8 @@ def _render_cards(items, prefix, show_date=True, include_overdue=False):
 
 def render_ai_settings():
     """AI 设置区域（默认折叠）。"""
-    import ai_settings
-    from ai_client import AIClientError
+    from taiplan import ai_settings
+    from taiplan.ai_client import AIClientError
     with st.expander(t('settings.ai.title'), expanded=False):
         cfg = _get_ai_config()
         cfg["enabled"] = st.toggle(t('ai.enable_label'), value=cfg.get("enabled", False))
@@ -1280,7 +1280,7 @@ def render_notification_settings():
         # Windows 系统测试通知（真实 Windows Notification Center）
         if st.button(t('reminder.send_system_test'), key="notif_test_win"):
             try:
-                from desktop_notifier import DesktopNotifier
+                from taiplan.desktop_notifier import DesktopNotifier
                 res = DesktopNotifier().notify_raw(
                     t("reminder.system_test_ok"), f"{product_info.APP_DISPLAY_NAME} {t('notify.desktop_suffix')}")
                 if res.success:
@@ -1293,7 +1293,7 @@ def render_notification_settings():
         # 开发者模式才显示内部调试信息
         if st.session_state.get("developer_mode"):
             with st.expander(t('reminder.debug_info'), expanded=False):
-                import database as _dbg
+                from taiplan import database as _dbg
                 st.write(t('reminder.debug_backend',
                            status=t('reminder.running')
                            if _dbg.is_worker_alive(60) else t('reminder.not_running')))
@@ -1306,7 +1306,7 @@ def render_notification_settings():
                         st.write("  " + t('reminder.debug_due_item', title=n.title,
                                          time=n.time, urgent=n.urgent))
 
-        import database as _db
+        from taiplan import database as _db
 
         # 提醒历史
         with st.expander(t('reminder.center_recent'), expanded=False):
@@ -1540,7 +1540,7 @@ def render_reminder_page():
     _header(t('nav.reminder'), t('page.reminder.subtitle'))
     render_reminder_center()
 
-    import database as _db
+    from taiplan import database as _db
     rows = _db.get_recent_notifications(40)
     if not rows:
         ui_components.empty_state(t('reminder.no_history'), t('empty.reminder_hint'))
@@ -1598,23 +1598,23 @@ def _settings_appearance():
         if st.button(t('settings.appearance.restart_now'), key="appearance_relaunch",
                      type="primary"):
             try:
-                import app_paths as _ap
+                from taiplan import app_paths as _ap
 
                 flag = _ap.get_restart_flag_path()
                 flag.parent.mkdir(parents=True, exist_ok=True)
                 flag.write_text("theme-base-changed", encoding="utf-8")
             except OSError:
                 pass
-            import desktop_runtime as _rt
+            from taiplan import desktop_runtime as _rt
 
             _rt.request_shutdown()  # 优雅退出；runtime 收尾后按标记自动拉起
 
 
 def _settings_desktop():
     ui_components.section_title(t('settings.desktop'))
-    import database as _db
-    import runtime_config as _rt
-    import startup_manager as _sm
+    from taiplan import database as _db
+    from taiplan import runtime_config as _rt
+    from taiplan import startup_manager as _sm
 
     alive = _db.is_worker_alive(max_age_seconds=60)
     ui_components.status_row(t('settings.desktop.backend'), t('reminder.running') if alive else t('reminder.not_running'), ok=alive)
@@ -1845,7 +1845,7 @@ def _settings_about():
     只展示显示层身份：品牌 / 标语 / 版本 / 作者 / 版权 / 许可证。
     没有真实仓库地址时不写假 URL。
     """
-    import database as _db
+    from taiplan import database as _db
 
     ui_components.section_title(product_info.APP_DISPLAY_NAME)
     st.markdown(f"**{product_info.APP_TAGLINE}**")
@@ -1965,7 +1965,7 @@ def main():
     # 否则默认配置会先落盘，导致真实旧配置无法被复制过来。
     migration_error = ""
     try:
-        import data_dir_migration
+        from taiplan import data_dir_migration
         migration = data_dir_migration.ensure_data_dir(logger_=logger)
         migration_ok = bool(migration.ok)
         migration_error = migration.detail or ""
@@ -1992,7 +1992,7 @@ def main():
         return
 
     try:
-        import first_run
+        from taiplan import first_run
         first_run.run_first_run(logger=logger)
     except Exception as exc:  # noqa: BLE001
         logger.warning("首次启动流程失败：%s", type(exc).__name__)

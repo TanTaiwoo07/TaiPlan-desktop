@@ -8,7 +8,7 @@
 import unittest
 from datetime import date
 
-import recurrence
+from taiplan import recurrence
 
 
 def make_task(task_id=1, date=None, time=None, is_recurring=0,

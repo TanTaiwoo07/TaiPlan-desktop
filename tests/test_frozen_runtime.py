@@ -17,13 +17,13 @@ from unittest import mock
 
 from tests import tests_env  # noqa: F401  必须最先导入（隔离真实数据目录）
 
-import app_paths
-import desktop_runtime
-import dynamic_port
-import frozen_smoke
+from taiplan import app_paths
+from taiplan import desktop_runtime
+from taiplan import dynamic_port
+from taiplan import frozen_smoke
 import main as app_main
-import streamlit_runner
-import windows_app_registration
+from taiplan import streamlit_runner
+from taiplan import windows_app_registration
 
 
 class SourceFrozenDetectionTest(unittest.TestCase):
@@ -228,7 +228,7 @@ class StableIdentityTest(unittest.TestCase):
                          "TodoApp.Desktop")
 
     def test_credential_id_stable_across_frozen(self):
-        import ai_settings
+        from taiplan import ai_settings
 
         args = ("openai_responses", "https://api.deepseek.com", "deepseek-flash")
         normal = ai_settings.make_credential_id(*args)
@@ -238,7 +238,7 @@ class StableIdentityTest(unittest.TestCase):
         self.assertTrue(normal.startswith("openai_responses|"))
 
     def test_credential_id_differs_per_provider(self):
-        import ai_settings
+        from taiplan import ai_settings
 
         a = ai_settings.make_credential_id("openai_responses", "https://api.deepseek.com", "m")
         b = ai_settings.make_credential_id("anthropic", "https://api.anthropic.com", "m")

@@ -11,10 +11,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import database
-import edit_session
-import services
-import ui.icons as icons
+from taiplan import database
+from taiplan import edit_session
+from taiplan import services
+from taiplan.ui import icons as icons
 
 from streamlit.testing.v1 import AppTest
 
@@ -355,7 +355,7 @@ class BlankClickActionTest(_Base):
 
     def setUp(self):
         super().setUp()
-        import calendar_settings
+        from taiplan import calendar_settings
         from unittest import mock
         self._cfg_tmp = tempfile.mktemp(suffix=".json")
         self._patcher = mock.patch.object(calendar_settings, "CONFIG_PATH",
@@ -371,7 +371,7 @@ class BlankClickActionTest(_Base):
         super().tearDown()
 
     def _set(self, **kw):
-        import calendar_settings
+        from taiplan import calendar_settings
         cfg = calendar_settings.load_calendar_config()
         cfg.update(kw)
         calendar_settings.save_calendar_config(cfg)

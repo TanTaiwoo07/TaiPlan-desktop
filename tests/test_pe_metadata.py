@@ -10,7 +10,7 @@ import struct
 import unittest
 from pathlib import Path
 
-import version  # noqa: E402
+from taiplan import version  # noqa: E402
 
 _VERSION = version.__version__
 

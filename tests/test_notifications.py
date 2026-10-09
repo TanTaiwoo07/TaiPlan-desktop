@@ -10,9 +10,9 @@ import tempfile
 import unittest
 from datetime import datetime
 
-import database
-import services
-import notification_service as ns
+from taiplan import database
+from taiplan import services
+from taiplan import notification_service as ns
 
 
 def dt(y, mo, d, h, mi):

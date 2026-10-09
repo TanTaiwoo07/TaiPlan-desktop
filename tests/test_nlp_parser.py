@@ -8,7 +8,7 @@
 import unittest
 from datetime import datetime
 
-from nlp_parser import parse_quick_task, QuickParseError
+from taiplan.nlp_parser import parse_quick_task, QuickParseError
 
 NOW = datetime(2026, 10, 2, 16, 0)
 

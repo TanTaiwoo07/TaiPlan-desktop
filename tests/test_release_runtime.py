@@ -13,12 +13,12 @@ from pathlib import Path
 
 from tests import tests_env  # noqa: F401
 
-import ai_settings
-import app_paths
-import database
-import dynamic_port
-import runtime_diagnostics
-import services
+from taiplan import ai_settings
+from taiplan import app_paths
+from taiplan import database
+from taiplan import dynamic_port
+from taiplan import runtime_diagnostics
+from taiplan import services
 
 
 def _occupy(port):
@@ -92,9 +92,9 @@ class PortSharingTest(unittest.TestCase):
 
     def test_all_components_share_selected_port(self):
         """pywebview / 托盘 / Worker 必须读同一个端口，不能各自硬编码。"""
-        import desktop_runtime
-        import reminder_worker  # noqa: F401
-        import tray_app
+        from taiplan import desktop_runtime
+        from taiplan import reminder_worker  # noqa: F401
+        from taiplan import tray_app
 
         with mock.patch.object(desktop_runtime, "_selected_port", None):
             port = desktop_runtime._choose_streamlit_port()
@@ -108,7 +108,7 @@ class PortSharingTest(unittest.TestCase):
         self.assertIn(str(port), health_url)
 
     def test_no_hardcoded_8501_in_runtime_urls(self):
-        import desktop_runtime
+        from taiplan import desktop_runtime
         with mock.patch.object(desktop_runtime, "_selected_port", 8509):
             self.assertIn("8509", desktop_runtime.streamlit_url())
             self.assertIn("8509", desktop_runtime.streamlit_health_url())
@@ -133,7 +133,7 @@ class CleanShutdownTest(unittest.TestCase):
         database.init_database()
 
     def test_shutdown_order_and_side_effects(self):
-        import desktop_runtime
+        from taiplan import desktop_runtime
 
         events = []
 
@@ -175,13 +175,13 @@ class CleanShutdownTest(unittest.TestCase):
         self.assertIsNone(database.get_runtime_status("reminder_worker"))
 
     def test_cleanup_is_idempotent(self):
-        import desktop_runtime
+        from taiplan import desktop_runtime
         runtime = desktop_runtime.DesktopRuntime()
         runtime.cleanup()
         runtime.cleanup()   # 不应抛异常
 
     def test_wal_checkpoint_on_clean_exit(self):
-        import desktop_runtime
+        from taiplan import desktop_runtime
         services.create_task("退出前任务")
         runtime = desktop_runtime.DesktopRuntime()
         runtime.cleanup()
@@ -303,8 +303,8 @@ class CredentialIdentityTest(unittest.TestCase):
 
     def test_service_name_is_stable(self):
         """W3：凭据身份迁移到 TaiPlan-AI；旧身份只读兼容，永不删除。"""
-        import ai_settings
-        import app_metadata
+        from taiplan import ai_settings
+        from taiplan import app_metadata
 
         self.assertEqual(ai_settings.SERVICE_NAME, "TaiPlan-AI")
         self.assertEqual(ai_settings.LEGACY_SERVICE_NAME, "TodoApp-AI")
@@ -328,7 +328,7 @@ class CredentialIdentityTest(unittest.TestCase):
         self.assertTrue(hasattr(ai_settings, "delete_api_key"))
 
     def test_app_id_is_stable(self):
-        import app_metadata
+        from taiplan import app_metadata
         self.assertEqual(app_metadata.APP_ID, "TaiWoo.TaiPlan",
                          "W4：AUMID 正式改为 TaiWoo.TaiPlan")
         self.assertEqual(app_metadata.LEGACY_APP_ID, "TodoApp.Desktop",
@@ -338,8 +338,8 @@ class CredentialIdentityTest(unittest.TestCase):
 class VersionSourceTest(unittest.TestCase):
 
     def test_single_version_source(self):
-        import app_metadata
-        import version
+        from taiplan import app_metadata
+        from taiplan import version
         self.assertRegex(version.__version__, r"^\d+\.\d+\.\d+$",
                          "版本号必须是 x.y.z（升版时这里不该写死）")
         self.assertEqual(app_metadata.VERSION, version.__version__)
@@ -371,7 +371,7 @@ class StartupOrderTest(unittest.TestCase):
         self._assert_migration_first("app.py")
 
     def test_runtime_migrates_before_creating_db(self):
-        self._assert_migration_first("desktop_runtime.py")
+        self._assert_migration_first("taiplan/desktop_runtime.py")
 
 
 if __name__ == "__main__":

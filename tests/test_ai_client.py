@@ -9,7 +9,7 @@ import json
 import unittest
 from unittest import mock
 
-from ai_client import AIConfig, AIClient, AIClientError, AIResult, AIUsage
+from taiplan.ai_client import AIConfig, AIClient, AIClientError, AIResult, AIUsage
 
 
 def _config(**kwargs):
@@ -40,7 +40,7 @@ class FakeResponse:
 class AIClientPayloadTest(unittest.TestCase):
     """测试三种协议的请求 payload 与参数映射。"""
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_openai_responses_payload(self, mock_post):
         mock_post.return_value = FakeResponse(200, {
             "output": [{"type": "message", "content": [{"type": "output_text", "text": "OK"}]}],
@@ -55,7 +55,7 @@ class AIClientPayloadTest(unittest.TestCase):
         self.assertEqual(r.text, "OK")
         self.assertEqual(r.usage.input_tokens, 5)
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_openai_compatible_payload(self, mock_post):
         mock_post.return_value = FakeResponse(200, {
             "choices": [{"message": {"content": "OK"}}],
@@ -71,7 +71,7 @@ class AIClientPayloadTest(unittest.TestCase):
         self.assertEqual(r.text, "OK")
         self.assertEqual(r.usage.input_tokens, 5)
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_anthropic_payload(self, mock_post):
         mock_post.return_value = FakeResponse(200, {
             "content": [{"type": "text", "text": "OK"}],
@@ -86,7 +86,7 @@ class AIClientPayloadTest(unittest.TestCase):
         self.assertEqual(kwargs["headers"]["anthropic-version"], "2023-06-01")
         self.assertEqual(r.text, "OK")
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_max_output_anthropic_mapping(self, mock_post):
         """统一 max_output_tokens → Anthropic max_tokens。"""
         mock_post.return_value = FakeResponse(200, {"content": [{"type": "text", "text": "OK"}]})
@@ -99,7 +99,7 @@ class AIClientPayloadTest(unittest.TestCase):
 class AIClientErrorTest(unittest.TestCase):
     """测试错误处理与 token 参数 fallback。"""
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_401(self, mock_post):
         mock_post.return_value = FakeResponse(401, None, "unauthorized")
         client = AIClient(_config())
@@ -108,7 +108,7 @@ class AIClientErrorTest(unittest.TestCase):
         self.assertIn("401", str(ctx.exception))
         self.assertNotIn("sk-test", str(ctx.exception))  # 不泄露 key
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_429(self, mock_post):
         mock_post.return_value = FakeResponse(429, None, "rate limit")
         client = AIClient(_config())
@@ -116,7 +116,7 @@ class AIClientErrorTest(unittest.TestCase):
             client.request("hi")
         self.assertIn("429", str(ctx.exception))
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_timeout(self, mock_post):
         import requests
         mock_post.side_effect = requests.exceptions.Timeout("timeout")
@@ -124,14 +124,14 @@ class AIClientErrorTest(unittest.TestCase):
         with self.assertRaises(AIClientError):
             client.request("hi")
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_json_parse_failure(self, mock_post):
         mock_post.return_value = FakeResponse(200, None, "not json")
         client = AIClient(_config())
         with self.assertRaises(AIClientError):
             client.request("hi")
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_max_completion_tokens_fallback(self, mock_post):
         """openai-compatible：max_completion_tokens 不兼容时自动重试 max_tokens。"""
         # 第一次返回 400 指向 max_completion_tokens，第二次成功
@@ -154,7 +154,7 @@ class AIClientErrorTest(unittest.TestCase):
 class AIClientResponsesTextTest(unittest.TestCase):
     """Responses API 文本提取的边界情况。"""
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_extract_message_ignores_reasoning(self, mock_post):
         """output 包含 reasoning + message，只提取 message 的 output_text。"""
         mock_post.return_value = FakeResponse(200, {
@@ -170,7 +170,7 @@ class AIClientResponsesTextTest(unittest.TestCase):
         r = client.request("hi")
         self.assertEqual(r.text, "OK")
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_top_level_output_text(self, mock_post):
         """兼容 top-level output_text。"""
         mock_post.return_value = FakeResponse(200, {"output_text": "OK"})
@@ -178,7 +178,7 @@ class AIClientResponsesTextTest(unittest.TestCase):
         r = client.request("hi")
         self.assertEqual(r.text, "OK")
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_empty_result_retries_once(self, mock_post):
         """第一次空内容，第二次成功。"""
         resp_empty = FakeResponse(200, {"output": [{"type": "reasoning"}]})
@@ -191,7 +191,7 @@ class AIClientResponsesTextTest(unittest.TestCase):
         self.assertEqual(r.text, "OK")
         self.assertEqual(mock_post.call_count, 2)
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_empty_result_after_retry_raises(self, mock_post):
         """两次都空，抛错。"""
         resp_empty = FakeResponse(200, {"output": [{"type": "reasoning"}]})
@@ -202,7 +202,7 @@ class AIClientResponsesTextTest(unittest.TestCase):
         self.assertIn("空内容", str(ctx.exception))
         self.assertEqual(mock_post.call_count, 2)
 
-    @mock.patch("ai_client.requests.post")
+    @mock.patch("taiplan.ai_client.requests.post")
     def test_connection_test_max_output_16(self, mock_post):
         """连接测试强制 max_output_tokens=16，且带 reasoning effort none。"""
         mock_post.return_value = FakeResponse(200, {

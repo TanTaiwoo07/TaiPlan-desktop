@@ -27,7 +27,7 @@ PROJECT_ROOT = Path(SPECPATH).resolve()  # noqa: F821 - PyInstaller 注入
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import packaging_tools  # noqa: E402
-import version as app_version  # noqa: E402
+from taiplan import version as app_version  # noqa: E402
 
 DEBUG = os.environ.get("TODO_APP_DEBUG") == "1"
 EXE_NAME = packaging_tools.DEBUG_EXE if DEBUG else packaging_tools.RELEASE_EXE
@@ -84,11 +84,16 @@ hiddenimports += [
     "pystray._win32",
     "PIL.Image",
     # 自家模块：app.py 由 Streamlit 当脚本跑，必须全部可 import
-    "ui", "ui.theme", "ui.layout", "ui.components", "ui.icons",
+    "taiplan.ui", "taiplan.ui.theme", "taiplan.ui.layout",
+    "taiplan.ui.components", "taiplan.ui.icons",
 ]
+# 自家运行时模块全部在 taiplan/ 包内（根目录只留进程/构建入口 main.py、app.py
+# 与构建脚本，两者都不进这个 glob）。
 hiddenimports += sorted(
-    p.stem for p in PROJECT_ROOT.glob("*.py")
-    if not p.stem.startswith("test_") and p.stem not in ("main", "todoapi")
+    "taiplan." + str(p.relative_to(PROJECT_ROOT / "taiplan").with_suffix(""))
+                     .replace("\\", ".").replace("/", ".")
+    for p in (PROJECT_ROOT / "taiplan").rglob("*.py")
+    if p.stem != "__init__" and not p.stem.startswith("test_")
 )
 
 # ----------------------------------------------------------------------

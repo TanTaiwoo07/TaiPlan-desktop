@@ -11,9 +11,9 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import desktop_runtime
-import desktop_window
-import dynamic_port
+from taiplan import desktop_runtime
+from taiplan import desktop_window
+from taiplan import dynamic_port
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -116,7 +116,7 @@ class NoUnownedReuseTest(unittest.TestCase):
     """e：拿到 runtime LOCK 后绝不复用仍然健康的旧 Streamlit。"""
 
     def test_source_has_no_reuse_path(self):
-        src = io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+        src = io.open(ROOT / "taiplan/desktop_runtime.py", encoding="utf-8").read()
         code = "\n".join(l for l in src.splitlines() if not l.strip().startswith("#"))
         self.assertNotIn("Reusing existing Streamlit", code)
         self.assertNotIn("reused = True", code)
@@ -137,8 +137,8 @@ class NoUnownedReuseTest(unittest.TestCase):
                 mock.patch.object(rt, "cleanup") as cleanup, \
                 mock.patch.object(desktop_runtime, "_start_streamlit") as starter, \
                 mock.patch.object(dynamic_port, "clear_published_state") as clearer, \
-                mock.patch("database.init_database"), \
-                mock.patch("first_run.run_first_run"), \
+                mock.patch("taiplan.database.init_database"), \
+                mock.patch("taiplan.first_run.run_first_run"), \
                 mock.patch.object(desktop_runtime, "appreg"):
             ok = rt.start()
         self.assertFalse(ok)
@@ -177,7 +177,7 @@ class ShutdownSecondGuardTest(unittest.TestCase):
 
     def test_never_kills_unknown_pid(self):
         """只做判断，绝不杀未知进程（剥掉注释后检查代码本体）。"""
-        src = io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+        src = io.open(ROOT / "taiplan/desktop_runtime.py", encoding="utf-8").read()
         code = "\n".join(l for l in src.splitlines() if not l.strip().startswith("#"))
         code = re.sub(r"#[^\n]*", "", code)
         for bad in ("taskkill", "TerminateProcess", "os.kill"):
@@ -202,7 +202,7 @@ class ErrorBoxPolicyTest(unittest.TestCase):
 
     def test_unattended_failure_writes_runtime_log(self):
         """无人值守失败必须写 runtime logger（Release EXE 无 console，stdout 不可见）。"""
-        src = io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+        src = io.open(ROOT / "taiplan/desktop_runtime.py", encoding="utf-8").read()
         start = src.find("if should_show_error_box(args):")
         self.assertGreater(start, 0)
         first = src[start:src.find("raise SystemExit(2)")]
@@ -216,7 +216,7 @@ class ErrorBoxPolicyTest(unittest.TestCase):
         self.assertEqual(second.count("_logger.error"), 1)
 
     def test_main_guards_both_failure_paths(self):
-        src = io.open(ROOT / "desktop_runtime.py", encoding="utf-8").read()
+        src = io.open(ROOT / "taiplan/desktop_runtime.py", encoding="utf-8").read()
         self.assertEqual(src.count("should_show_error_box(args)"), 2)
 
 

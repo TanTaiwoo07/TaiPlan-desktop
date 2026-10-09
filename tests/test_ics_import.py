@@ -28,7 +28,7 @@ from tests import tests_env  # noqa: F401
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import ics_import as ics  # noqa: E402
+from taiplan import ics_import as ics  # noqa: E402
 
 LABELS = {
     "untitled": "未命名事件", "location": "地点", "invalid_url": "链接已忽略",
@@ -54,7 +54,7 @@ class IcsBase(unittest.TestCase):
         self._env = os.environ.get("TODO_APP_DATA_DIR")
         os.environ["TODO_APP_DATA_DIR"] = str(self.tmp / "TaiPlan")
         (self.tmp / "TaiPlan").mkdir(parents=True, exist_ok=True)
-        import database
+        from taiplan import database
 
         self.database = database
         self._db_path = database.DB_PATH
@@ -258,7 +258,7 @@ class ImportTest(IcsBase):
         return ics.parse_ics(text)[0]
 
     def test_import_creates_tasks_and_backup(self):
-        import services
+        from taiplan import services
 
         report = ics.import_events(self._events(SINGLE), LABELS)
         self.assertEqual(report.created, 1)
@@ -283,7 +283,7 @@ class ImportTest(IcsBase):
         self.assertEqual(report.duplicates, 1)
 
     def test_dry_run_writes_nothing(self):
-        import services
+        from taiplan import services
 
         report = ics.import_events(self._events(SINGLE), LABELS, dry_run=True)
         self.assertEqual(report.created, 1)
@@ -297,7 +297,7 @@ class ImportTest(IcsBase):
         self.assertIn(LABELS["cancelled"], report.notes)
 
     def test_imported_task_keeps_recurrence(self):
-        import services
+        from taiplan import services
 
         text = SINGLE.replace("END:VEVENT", "RRULE:FREQ=WEEKLY;BYDAY=WE;UNTIL=20261231T000000Z\nEND:VEVENT")
         report = ics.import_events(self._events(text), LABELS)
@@ -312,7 +312,7 @@ class ImportTest(IcsBase):
 # =============================================================== 结构不变式
 class InvariantTest(unittest.TestCase):
     def test_no_sql_and_no_new_third_party_deps(self):
-        src = io.open(ROOT / "ics_import.py", encoding="utf-8-sig").read()
+        src = io.open(ROOT / "taiplan/ics_import.py", encoding="utf-8-sig").read()
         self.assertNotIn("import sqlite3", src, "SQL 只能出现在 database.py")
         self.assertNotIn("execute(", src)
         for forbidden in ("import icalendar", "import vobject", "from dateutil",
@@ -321,7 +321,7 @@ class InvariantTest(unittest.TestCase):
 
     def test_no_hardcoded_ui_text_in_module(self):
         """导入器不产出用户可见文案：所有措辞由调用方通过 labels 传入。"""
-        src = io.open(ROOT / "ics_import.py", encoding="utf-8-sig").read()
+        src = io.open(ROOT / "taiplan/ics_import.py", encoding="utf-8-sig").read()
         self.assertIn("labels.get", src)
         self.assertNotIn("from i18n", src)
 
@@ -332,7 +332,7 @@ class SettingsUiTest(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp(prefix="ics_ui_"))
         self._env = os.environ.get("TODO_APP_DATA_DIR")
         os.environ["TODO_APP_DATA_DIR"] = str(self.tmp / "TaiPlan")
-        import database
+        from taiplan import database
 
         self.database = database
         self._db = database.DB_PATH

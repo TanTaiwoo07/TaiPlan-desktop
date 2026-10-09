@@ -11,9 +11,9 @@ import unittest
 from datetime import datetime
 from unittest import mock
 
-import database
-import notification_service as notif
-import services
+from taiplan import database
+from taiplan import notification_service as notif
+from taiplan import services
 
 
 class WorkerClaimTest(unittest.TestCase):
@@ -39,14 +39,15 @@ class WorkerClaimTest(unittest.TestCase):
         self.assertEqual(len(due), 1)
 
     # 2. claim 成功 → notify 一次
-    @mock.patch("desktop_notifier.DesktopNotifier.notify_task_due")
+    @mock.patch("taiplan.desktop_notifier.DesktopNotifier.notify_task_due")
     def test_claim_then_notify(self, mock_notify):
         self._due_task()
         due = notif.get_due_notifications(now=datetime(2026, 10, 3, 15, 0))
         n = due[0]
         self.assertTrue(notif.claim_notification(n))
         # 模拟 worker 发送
-        notifier = __import__("desktop_notifier").DesktopNotifier()
+        from taiplan import desktop_notifier as _dn
+        notifier = _dn.DesktopNotifier()
         notifier.notify_task_due(n.message, urgent=n.urgent)
         mock_notify.assert_called_once()
         notif.mark_notification_delivered(n, channel="desktop")

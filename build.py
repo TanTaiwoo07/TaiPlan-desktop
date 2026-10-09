@@ -28,7 +28,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 import packaging_tools  # noqa: E402
-import version as app_version  # noqa: E402
+from taiplan import version as app_version  # noqa: E402
 
 BUILD_DIR = PROJECT_ROOT / "build"
 DIST_DIR = PROJECT_ROOT / "dist"
@@ -63,7 +63,7 @@ def _assert_inside_project(path: Path) -> None:
         raise SystemExit(f"拒绝删除项目目录之外的路径: {p}")
     # 再明确挡一次用户数据目录
     try:
-        import app_paths
+        from taiplan import app_paths
 
         data_dir = Path(app_paths.get_user_data_dir()).resolve()
         if data_dir == p or (data_dir in p.parents):
@@ -112,7 +112,7 @@ def step3_clean_dist(base_name):
 def step4_guard_userdata():
     log(4, "确认不会触碰用户数据（LOCALAPPDATA）...")
     try:
-        import app_paths
+        from taiplan import app_paths
 
         data_dir = Path(app_paths.get_user_data_dir())
         database_path = Path(app_paths.get_database_path())
@@ -176,7 +176,7 @@ def step7_check_exe(base_name, exe_name):
 def _read_credential_probe():
     """拿真实凭据用于比对（只返回字符串，不打印）。取不到就返回 None。"""
     try:
-        import ai_settings
+        from taiplan import ai_settings
 
         cfg, _ = ai_settings.load_config()
         cid = ai_settings.make_credential_id(

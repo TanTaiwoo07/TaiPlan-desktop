@@ -10,8 +10,8 @@ from pathlib import Path
 from unittest import mock
 
 import create_shortcut
-import launcher
-import startup_manager
+from taiplan import launcher
+from taiplan import startup_manager
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 VBS = PROJECT_DIR / "start_todo_silent.vbs"
@@ -116,9 +116,11 @@ class LauncherLaunchTest(unittest.TestCase):
 
         self.assertEqual(code, 0)
         self.assertEqual(captured["cmd"][0], str(launcher.PYTHONW))
-        self.assertEqual(captured["cmd"][1], str(launcher.RUNTIME))
+        # 子进程用 -m 方式启动：保证 taiplan 包可导入（脚本直跑时 sys.path[0]
+        # 会是 taiplan/ 而不是项目根，绝对导入会失败）
+        self.assertEqual(captured["cmd"][1], "-m")
+        self.assertEqual(captured["cmd"][2], "taiplan.desktop_runtime")
         self.assertTrue(Path(captured["cmd"][0]).is_absolute())
-        self.assertTrue(Path(captured["cmd"][1]).is_absolute())
         self.assertEqual(captured["kwargs"]["cwd"], str(launcher.PROJECT_DIR))
 
     def test_autostart_is_forwarded(self):

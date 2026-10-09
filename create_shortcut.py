@@ -18,7 +18,7 @@ from pathlib import Path
 
 _logger = logging.getLogger("create_shortcut")
 
-import app_paths
+from taiplan import app_paths
 
 PROJECT_DIR = app_paths.get_project_root()
 SHORTCUT_NAME = "TaiPlan.lnk"

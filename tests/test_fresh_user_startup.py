@@ -85,8 +85,8 @@ class StartupOrderTest(unittest.TestCase):
 class ClassificationMatrixTest(unittest.TestCase):
     def setUp(self):
         self.base = Path(tempfile.mkdtemp(prefix="plan_matrix_"))
-        import app_paths
-        import data_dir_migration
+        from taiplan import app_paths
+        from taiplan import data_dir_migration
 
         self.ap = app_paths
         self.ddm = data_dir_migration
@@ -204,7 +204,7 @@ class BootstrapLoggingTest(unittest.TestCase):
         self._env = {k: os.environ.get(k) for k in
                      ("TODO_APP_DATA_DIR", "TODO_APP_BOOTSTRAP_LOG_DIR")}
         os.environ["TODO_APP_DATA_DIR"] = str(self.tmp / "TaiPlan")
-        import logging_config
+        from taiplan import logging_config
 
         self.lc = logging_config
 
@@ -217,7 +217,7 @@ class BootstrapLoggingTest(unittest.TestCase):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def test_logs_go_to_bootstrap_dir_then_official(self):
-        import app_paths
+        from taiplan import app_paths
 
         boot = self.tmp / "boot"
         os.environ[app_paths.BOOTSTRAP_LOG_DIR_ENV] = str(boot)
@@ -388,8 +388,8 @@ class MissingCoverageTest(unittest.TestCase):
         """判定必须发生在任何 TaiPlan 写入之前（顺序回归）。"""
         from unittest import mock
 
-        import app_paths
-        import data_dir_migration as ddm
+        from taiplan import app_paths
+        from taiplan import data_dir_migration as ddm
 
         self.assertFalse(self.target.exists(), "前置：目标目录不应存在")
         with mock.patch.object(app_paths, "get_user_data_dir", lambda: self.target), \
@@ -405,8 +405,8 @@ class MissingCoverageTest(unittest.TestCase):
         """全新用户第一次判定之后（运行期已建好空库）再次判定，必须仍然放行。"""
         from unittest import mock
 
-        import app_paths
-        import data_dir_migration as ddm
+        from taiplan import app_paths
+        from taiplan import data_dir_migration as ddm
 
         with mock.patch.object(app_paths, "get_user_data_dir", lambda: self.target), \
                 mock.patch.object(app_paths, "get_legacy_app_dir", lambda: self.legacy):
@@ -423,7 +423,7 @@ class MissingCoverageTest(unittest.TestCase):
 
     def test_program_generated_empty_backup_is_not_user_data(self):
         """程序自己生成的空备份（含 WAL 侧车）不是用户数据，不得阻断全新用户。"""
-        import data_dir_migration as ddm
+        from taiplan import data_dir_migration as ddm
 
         self.target.mkdir(parents=True, exist_ok=True)
         ddm._write_first_run_marker(self.target, {"kind": "fresh_user"})
@@ -439,7 +439,7 @@ class MissingCoverageTest(unittest.TestCase):
         """主库健康时，backups/ 里的备份是程序产物（自动备份/手动备份都落这里），
         不应反过来把用户拦在门外；"主库丢了 + 备份有数据"才是停止信号
         （见 FreshUserWithDataTest.test_missing_db_with_data_backups_is_blocked）。"""
-        import data_dir_migration as ddm
+        from taiplan import data_dir_migration as ddm
 
         self.target.mkdir(parents=True, exist_ok=True)
         ddm._write_first_run_marker(self.target, {"kind": "fresh_user"})
@@ -693,7 +693,7 @@ class FreshUserWithDataTest(unittest.TestCase):
         # 必须指向临时目录：data_backup.backup_database() 会按它决定备份落到哪里，
         # 否则测试会往真实用户目录写备份（曾经发生过，已改）。
         os.environ["TODO_APP_DATA_DIR"] = str(self.target)
-        import data_dir_migration as ddm
+        from taiplan import data_dir_migration as ddm
 
         self.ddm = ddm
 
@@ -703,14 +703,14 @@ class FreshUserWithDataTest(unittest.TestCase):
         else:
             os.environ["TODO_APP_DATA_DIR"] = self._env
         if hasattr(self, "_db_path_before"):
-            import database
+            from taiplan import database
 
             database.DB_PATH = self._db_path_before
         shutil.rmtree(self.base, ignore_errors=True)
 
     def _fresh_init(self):
         """模拟程序自己初始化过的目录：首次运行标记 + 空库。"""
-        import database
+        from taiplan import database
 
         if not hasattr(self, "_db_path_before"):
             self._db_path_before = database.DB_PATH      # 结束后必须还原，避免污染其它用例
@@ -721,12 +721,12 @@ class FreshUserWithDataTest(unittest.TestCase):
         database.init_database()
 
     def _add_task(self, title="我自己建的任务"):
-        import services
+        from taiplan import services
 
         services.create_task(title, date="2026-10-07")
 
     def _make_backup_with_data(self):
-        import data_backup
+        from taiplan import data_backup
 
         return data_backup.backup_database()
 
@@ -771,8 +771,8 @@ class FreshUserWithDataTest(unittest.TestCase):
 
     def test_blocked_hint_does_not_claim_legacy_without_legacy(self):
         """全新用户不该看到"旧数据仍在旧目录"这种无中生有的提示。"""
-        zh = io.open(ROOT / "i18n" / "zh_CN.py", encoding="utf-8-sig").read()
-        en = io.open(ROOT / "i18n" / "en_US.py", encoding="utf-8-sig").read()
+        zh = io.open(ROOT / "taiplan" / "i18n" / "zh_CN.py", encoding="utf-8-sig").read()
+        en = io.open(ROOT / "taiplan" / "i18n" / "en_US.py", encoding="utf-8-sig").read()
         self.assertNotIn("TodoApp", zh.split('"error.migration_blocked_hint"')[1][:160])
         self.assertNotIn("TodoApp", en.split('"error.migration_blocked_hint"')[1][:200])
         src = io.open(ROOT / "app.py", encoding="utf-8-sig").read()
@@ -814,7 +814,7 @@ class StateConfigAllowlistTest(unittest.TestCase):
         return found
 
     def test_every_state_file_is_allowlisted(self):
-        import data_dir_migration as ddm
+        from taiplan import data_dir_migration as ddm
 
         used = self._literals("get_state_path",
                               "[A-Z_]*STATE_FILENAME|FIRST_RUN_FILENAME")
@@ -822,7 +822,7 @@ class StateConfigAllowlistTest(unittest.TestCase):
         self.assertEqual(missing, [], f"state/ 白名单缺少：{missing}")
 
     def test_every_config_file_is_allowlisted(self):
-        import data_dir_migration as ddm
+        from taiplan import data_dir_migration as ddm
 
         used = self._literals("get_config_path")
         missing = sorted(used - set(ddm._KNOWN_CONFIG_FILES))

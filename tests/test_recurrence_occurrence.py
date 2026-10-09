@@ -10,9 +10,9 @@ import sqlite3
 import tempfile
 import unittest
 
-import database
-import recurrence
-import services
+from taiplan import database
+from taiplan import recurrence
+from taiplan import services
 
 
 class OccurrenceProjectionTest(unittest.TestCase):

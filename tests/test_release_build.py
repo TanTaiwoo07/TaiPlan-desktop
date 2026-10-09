@@ -14,12 +14,12 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import app_metadata
+from taiplan import app_metadata
 import build_installer
 import build_release
-import runtime_diagnostics
+from taiplan import runtime_diagnostics
 import third_party_notices
-import version
+from taiplan import version
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -59,7 +59,7 @@ class ReleaseNotesTest(unittest.TestCase):
 
     def test_exists_and_has_version(self):
         """版本号必须与 version.py 一致（升版时这里不该再写死旧版本）。"""
-        import version
+        from taiplan import version
 
         text = self._notes()
         self.assertIn(version.__version__, text)

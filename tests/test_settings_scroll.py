@@ -25,9 +25,9 @@ from tests import tests_env  # noqa: F401
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import version  # noqa: E402
-import ui.icons as icons  # noqa: E402
-import ui.layout as layout  # noqa: E402
+from taiplan import version  # noqa: E402
+from taiplan.ui import icons as icons  # noqa: E402
+from taiplan.ui import layout as layout  # noqa: E402
 from streamlit.testing.v1 import AppTest  # noqa: E402
 
 APP_PATH = str(ROOT / "app.py")
@@ -50,15 +50,15 @@ EN_TITLES = ("Appearance", "Language", "AI", "Reminders", "Calendar", "Desktop",
 
 class _Base(unittest.TestCase):
     def setUp(self):
-        import database
-        import services
+        from taiplan import database
+        from taiplan import services
 
         self.tmp = tempfile.mktemp(suffix=".db")
         database.DB_PATH = self.tmp
         database.init_database()
         services.create_task("settings probe", date="2026-10-06", time="14:00",
                              duration_minutes=60)
-        from i18n import set_language
+        from taiplan.i18n import set_language
 
         set_language("system")
         self.addCleanup(set_language, "system")
@@ -148,8 +148,8 @@ class StructureTest(_Base):
 class TitlesTest(_Base):
     def _set_lang(self, lang):
         """把语言写进 config（AppTest 会重新执行 app.py，读到的是持久化设置）。"""
-        import language_store
-        from i18n import set_language
+        from taiplan import language_store
+        from taiplan.i18n import set_language
 
         path = language_store.config_path()
         backup = path.read_bytes() if path.is_file() else None
@@ -209,7 +209,7 @@ class ControlsTest(_Base):
         self.assertTrue(len(at.checkbox) >= 1 or len(at.toggle) >= 1)
 
     def test_language_switch_still_persists(self):
-        import language_store
+        from taiplan import language_store
 
         old = None
         p = language_store.config_path()
@@ -219,7 +219,7 @@ class ControlsTest(_Base):
             language_store.save_setting("en-US")
             data = json.loads(p.read_text(encoding="utf-8"))
             self.assertEqual(data["language"], "en-US")
-            from i18n import get_language
+            from taiplan.i18n import get_language
 
             self.assertEqual(get_language(), "en-US")
         finally:
@@ -227,14 +227,14 @@ class ControlsTest(_Base):
                 p.write_bytes(old)
             else:
                 p.unlink(missing_ok=True)
-            from i18n import set_language
+            from taiplan.i18n import set_language
 
             set_language("system")
 
 
 class AboutTest(_Base):
     def test_about_content(self):
-        from i18n import set_language
+        from taiplan.i18n import set_language
 
         set_language("zh-CN")
         at = self.settings_app()
@@ -245,11 +245,11 @@ class AboutTest(_Base):
             self.assertIn(needle, md, f"About 缺少: {needle}")
 
     def test_taiwoo_chen_exact_spelling(self):
-        for rel in ("product_info.py", "i18n/zh_CN.py", "i18n/en_US.py"):
+        for rel in ("taiplan/product_info.py", "taiplan/i18n/zh_CN.py", "taiplan/i18n/en_US.py"):
             src = io.open(ROOT / rel, encoding="utf-8-sig").read()
             self.assertIn("TaiWoo_Chen", src, f"{rel} 缺少 TaiWoo_Chen")
-        for rel in ("app.py", "product_info.py", "i18n/zh_CN.py", "i18n/en_US.py",
-                    "ui/layout.py", "ui/icons.py"):
+        for rel in ("app.py", "taiplan/product_info.py", "taiplan/i18n/zh_CN.py", "taiplan/i18n/en_US.py",
+                    "taiplan/ui/layout.py", "taiplan/ui/icons.py"):
             src = io.open(ROOT / rel, encoding="utf-8-sig").read()
             for wrong in ("Taiwoo_Chen", "TaiWooChen", "TaiwooChen", "taiwoo_chen",
                           "Taiwoo_chen"):
@@ -265,7 +265,7 @@ class AboutTest(_Base):
         历史语义（0.1.0–0.1.1）：仓库未建，禁止任何假 URL。
         现在反转：必须是 TanTaiwoo07/TaiPlan-desktop，且 About 渲染走链接分支。
         """
-        import product_info
+        from taiplan import product_info
 
         self.assertEqual(product_info.APP_REPO_URL,
                          "https://github.com/TanTaiwoo07/TaiPlan-desktop")
@@ -284,8 +284,8 @@ class HardcodedTextTest(_Base):
                              r"toggle|checkbox|radio|caption|info|warning|error|success|"
                              r"text_input|date_input|popover|expander)\b|label=|help=)")
         offenders = []
-        for rel in ("app.py", "ui/layout.py", "ui/components.py", "ui/icons.py",
-                    "calendar_view.py"):
+        for rel in ("app.py", "taiplan/ui/layout.py", "taiplan/ui/components.py", "taiplan/ui/icons.py",
+                    "taiplan/calendar_view.py"):
             for i, line in enumerate(io.open(ROOT / rel, encoding="utf-8-sig",
                                              errors="replace").read().split("\n"), 1):
                 s = line.strip()

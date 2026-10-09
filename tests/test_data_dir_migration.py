@@ -24,8 +24,8 @@ from tests import tests_env  # noqa: F401  必须早于项目模块导入
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import app_paths  # noqa: E402
-import data_dir_migration as ddm  # noqa: E402
+from taiplan import app_paths  # noqa: E402
+from taiplan import data_dir_migration as ddm  # noqa: E402
 
 
 # --------------------------------------------------------------- fake keyring
@@ -72,7 +72,7 @@ class Base(unittest.TestCase):
         os.environ["TODO_APP_LEGACY_APP_DIR"] = str(self.legacy)
         self.addCleanup(self._cleanup_env)
 
-        import ai_settings
+        from taiplan import ai_settings
 
         self.fake = FakeKeyring()
         self._orig_keyring = ai_settings.keyring
@@ -99,7 +99,7 @@ class Base(unittest.TestCase):
         self.assertTrue(str(data_dir).startswith(str(self.tmp)))
 
     def _restore_keyring(self):
-        import ai_settings
+        from taiplan import ai_settings
 
         ai_settings.keyring = self._orig_keyring
 
@@ -110,11 +110,11 @@ class Base(unittest.TestCase):
         if corrupt:
             db.write_bytes(b"this is not a sqlite database at all" * 10)
             return db
-        import database
+        from taiplan import database
 
         database.DB_PATH = str(db)
         database.init_database()
-        import services
+        from taiplan import services
 
         for i in range(tasks):
             services.create_task(f"任务 {i}", date="2026-10-06", time="09:00",
@@ -170,12 +170,12 @@ class Base(unittest.TestCase):
 
     def make_new_valid(self, tasks=3):
         """构造一个"有效的新库"（库 + 成功标记）。"""
-        import database
+        from taiplan import database
 
         self.target.mkdir(parents=True, exist_ok=True)
         database.DB_PATH = str(self.target / "todo.db")
         database.init_database()
-        import services
+        from taiplan import services
 
         for i in range(tasks):
             services.create_task(f"新库任务 {i}", date="2026-10-07", time="10:00")
@@ -240,7 +240,7 @@ class OldOnlyTest(Base):
     def test_migrated_user_has_no_demo_tasks(self):
         self.make_legacy_db(tasks=4)
         ddm.migrate(force=True, legacy_dir=self.legacy, target_dir=self.target)
-        import database
+        from taiplan import database
 
         database.DB_PATH = str(self.target / "todo.db")
         database.init_database()
@@ -293,7 +293,7 @@ class NewOnlyTest(Base):
 
     def test_new_dir_without_marker_is_not_treated_as_success(self):
         """库能打开但没有成功标记 → 不能被当成迁移成功。"""
-        import database
+        from taiplan import database
 
         self.target.mkdir(parents=True, exist_ok=True)
         database.DB_PATH = str(self.target / "todo.db")
@@ -337,7 +337,7 @@ class NeitherTest(Base):
         self.assertFalse((self.target / "todo.db").exists(), "全新用户不应被预先塞入空库")
 
     def test_fresh_user_gets_no_demo_tasks(self):
-        import database
+        from taiplan import database
 
         self.target.mkdir(parents=True, exist_ok=True)
         database.DB_PATH = str(self.target / "todo.db")
@@ -470,7 +470,7 @@ class PartialTest(Base):
 
 class CredentialTest(Base):
     def _account(self):
-        import ai_settings
+        from taiplan import ai_settings
 
         return ai_settings.legacy_credential_id(self.legacy / "config" / "ai_config.json")
 
@@ -481,7 +481,7 @@ class CredentialTest(Base):
 
     def test_legacy_credential_only_is_copied(self):
         value = self._seed_legacy_cred()
-        import ai_settings
+        from taiplan import ai_settings
 
         info = ai_settings.migrate_credential(
             legacy_config_path=self.legacy / "config" / "ai_config.json")
@@ -492,7 +492,7 @@ class CredentialTest(Base):
 
     def test_new_credential_only_is_used(self):
         self.make_legacy_configs()
-        import ai_settings
+        from taiplan import ai_settings
 
         self.fake.store[("TaiPlan-AI", self._account())] = "sk-" + "n" * 32
         info = ai_settings.migrate_credential(
@@ -502,7 +502,7 @@ class CredentialTest(Base):
 
     def test_both_new_wins(self):
         self._seed_legacy_cred("sk-" + "l" * 32)
-        import ai_settings
+        from taiplan import ai_settings
 
         new_value = "sk-" + "w" * 32
         self.fake.store[("TaiPlan-AI", self._account())] = new_value
@@ -513,7 +513,7 @@ class CredentialTest(Base):
     def test_write_failure_falls_back_to_legacy(self):
         """写新身份失败 → 不允许明文降级，但必须仍能读到旧凭据。"""
         value = self._seed_legacy_cred("sk-" + "f" * 32)
-        import ai_settings
+        from taiplan import ai_settings
 
         self.fake.fail_write = True
         info = ai_settings.migrate_credential(
@@ -527,7 +527,7 @@ class CredentialTest(Base):
 
     def test_keyring_unavailable_is_not_plaintext(self):
         self._seed_legacy_cred()
-        import ai_settings
+        from taiplan import ai_settings
 
         ai_settings.keyring = None
         info = ai_settings.migrate_credential(
@@ -540,7 +540,7 @@ class CredentialTest(Base):
 
     def test_never_deletes_legacy_credential(self):
         self._seed_legacy_cred()
-        import ai_settings
+        from taiplan import ai_settings
 
         ai_settings.migrate_credential(
             legacy_config_path=self.legacy / "config" / "ai_config.json")

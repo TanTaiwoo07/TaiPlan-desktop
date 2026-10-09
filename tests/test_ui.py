@@ -12,12 +12,12 @@ from datetime import date, timedelta
 from pathlib import Path
 from unittest import mock
 
-import database
-import services
-import ui.components as components
-import ui.icons as icons
-import ui.layout as layout
-import ui.theme as theme
+from taiplan import database
+from taiplan import services
+from taiplan.ui import components as components
+from taiplan.ui import icons as icons
+from taiplan.ui import layout as layout
+from taiplan.ui import theme as theme
 
 from streamlit.testing.v1 import AppTest
 
@@ -132,7 +132,7 @@ class IconsTest(unittest.TestCase):
 
         比原来只检查字面量更强的断言（原来第三项是中文标签，现在必须走 t()）。
         """
-        from i18n import LANGUAGE_EN_US, LANGUAGE_ZH_CN, set_language
+        from taiplan.i18n import LANGUAGE_EN_US, LANGUAGE_ZH_CN, set_language
 
         try:
             for lang in (LANGUAGE_ZH_CN, LANGUAGE_EN_US):
@@ -153,7 +153,7 @@ class IconsTest(unittest.TestCase):
 
         比原来只检查字面量更强的断言（原来第三项是中文标签，现在必须走 t()）。
         """
-        from i18n import LANGUAGE_EN_US, LANGUAGE_ZH_CN, set_language
+        from taiplan.i18n import LANGUAGE_EN_US, LANGUAGE_ZH_CN, set_language
 
         try:
             for lang in (LANGUAGE_ZH_CN, LANGUAGE_EN_US):
@@ -196,7 +196,7 @@ class ComponentsTest(unittest.TestCase):
         self.assertEqual(components._end_time(None, 60), "")
 
     def test_meta_html_urgent_chip(self):
-        import models
+        from taiplan import models
         item = models.TaskOccurrence(task_id=1, title="x", date="2026-10-05",
                                      time="14:00", duration_minutes=60, priority="urgent")
         html_out = components.meta_html(item)
@@ -204,12 +204,12 @@ class ComponentsTest(unittest.TestCase):
         self.assertIn("14:00", html_out)
 
     def test_meta_html_normal_has_no_priority_chip(self):
-        import models
+        from taiplan import models
         item = models.TaskOccurrence(task_id=1, title="x", date="2026-10-05", priority="normal")
         self.assertNotIn("chip urgent", components.meta_html(item))
 
     def test_card_html_escapes_html(self):
-        import models
+        from taiplan import models
         item = models.TaskOccurrence(task_id=1, title="<script>alert(1)</script>",
                                      date="2026-10-05")
         out = components.card_html(item)
@@ -217,19 +217,19 @@ class ComponentsTest(unittest.TestCase):
         self.assertIn("&lt;script&gt;", out)
 
     def test_card_desc_truncated(self):
-        import models
+        from taiplan import models
         item = models.TaskOccurrence(task_id=1, title="t", date="2026-10-05",
                                      description="长" * 300)
         out = components.card_html(item)
         self.assertIn("…", out)
 
     def test_overdue_flag_chip(self):
-        import models
+        from taiplan import models
         item = models.TaskOccurrence(task_id=1, title="t", date="2026-10-05", time="10:00")
         self.assertIn("逾期", components.meta_html(item, is_overdue=True))
 
     def test_conflict_label_rendered(self):
-        import models
+        from taiplan import models
         item = models.TaskOccurrence(task_id=1, title="t", date="2026-10-05", time="10:00")
         self.assertIn("冲突", components.meta_html(item, conflict_label="项目会议"))
 
@@ -378,7 +378,7 @@ class KeyboardShortcutTest(unittest.TestCase):
     BASE = Path(__file__).resolve().parent.parent
 
     def test_helper_exists_and_idempotent(self):
-        src = io.open(self.BASE / "ui" / "components.py",
+        src = io.open(self.BASE / "taiplan" / "ui" / "components.py",
                       encoding="utf-8-sig").read()
         self.assertIn("def keyboard_shortcuts_js", src)
         self.assertIn("__taiplanHotkeys", src, "必须幂等（防重复监听）")

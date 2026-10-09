@@ -7,8 +7,8 @@ import unittest
 from unittest import mock
 from pathlib import Path
 
-import startup_manager
-import desktop_runtime
+from taiplan import startup_manager
+from taiplan import desktop_runtime
 
 
 class StartupManagerTest(unittest.TestCase):
@@ -58,7 +58,7 @@ class StartupManagerTest(unittest.TestCase):
 
     def test_shortcut_name_matches_installer(self):
         """第 17 阶段：启动项名称/位置必须与安装器 [Icons] 一致（同一个 .lnk）。"""
-        import app_metadata
+        from taiplan import app_metadata
         self.assertEqual(
             startup_manager.STARTUP_LNK_NAME, app_metadata.SHORTCUT_NAME + ".lnk")
         self.assertEqual(

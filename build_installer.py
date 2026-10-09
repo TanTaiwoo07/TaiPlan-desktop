@@ -112,7 +112,7 @@ class BuildError(RuntimeError):
 def read_version() -> tuple[str, str]:
     """从 version.py 读版本（唯一来源，不在 .iss / 脚本里硬编码）。"""
     sys.path.insert(0, str(ROOT))
-    import version as version_module  # noqa: PLC0415
+    from taiplan import version as version_module  # noqa: PLC0415
 
     return version_module.__version__, getattr(version_module, "BUILD_CHANNEL", "dev")
 

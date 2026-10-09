@@ -41,7 +41,7 @@ COMPONENTS = {"toast_ok", "toast_err", "friendly_error", "status_row", "empty_st
 
 def _scan_unmapped_cjk():
     offenders = []
-    for p in sorted(ROOT.glob("*.py")) + sorted((ROOT / "ui").glob("*.py")):
+    for p in sorted(ROOT.glob("*.py")) + sorted((ROOT / "taiplan" / "ui").glob("*.py")):
         if p.name.startswith("test_"):
             continue
         tree = ast.parse(io.open(p, encoding="utf-8-sig", errors="replace").read())
@@ -96,7 +96,7 @@ class DisplayMappingTest(unittest.TestCase):
     """en-US 只输出 ASCII；zh-CN 复现原中文（证明显示保真、取值未动）。"""
 
     def setUp(self):
-        import i18n
+        from taiplan import i18n
 
         self.i18n = i18n
         self._orig = i18n.get_language()
@@ -106,9 +106,9 @@ class DisplayMappingTest(unittest.TestCase):
 
     def test_mappings_are_english_and_chinese(self):
         import app
-        import ui.theme as theme
-        from i18n import LANGUAGE_EN_US, LANGUAGE_ZH_CN
-        import calendar_view
+        from taiplan.ui import theme as theme
+        from taiplan.i18n import LANGUAGE_EN_US, LANGUAGE_ZH_CN
+        from taiplan import calendar_view
 
         pairs = [
             ("mode_label", theme.mode_label, theme.MODE_OPTIONS),
@@ -140,7 +140,7 @@ class DisplayMappingTest(unittest.TestCase):
                                 f"{name}({v!r}) 在 zh-CN 下应是中文: {fn(v)!r}")
 
     def test_appearance_modes_keep_chinese_values(self):
-        import ui.theme as theme
+        from taiplan.ui import theme as theme
 
         self.assertEqual(theme.MODE_OPTIONS, ["跟随系统", "浅色", "深色"])
         self.assertEqual(theme.DENSITY_OPTIONS, ["舒适", "紧凑"])
@@ -157,8 +157,8 @@ class PersistedValueCompatTest(unittest.TestCase):
         os.environ["TODO_APP_DATA_DIR"] = self.tmp
         import importlib
 
-        import app_paths
-        import ui.theme as theme
+        from taiplan import app_paths
+        from taiplan.ui import theme as theme
 
         self.theme = importlib.reload(theme)
         importlib.reload(app_paths)
@@ -181,7 +181,7 @@ class PersistedValueCompatTest(unittest.TestCase):
         cfg = self.theme.load_appearance()
         self.assertEqual(cfg["mode"], "深色")
         self.assertEqual(cfg["density"], "紧凑")
-        import app_paths
+        from taiplan import app_paths
 
         raw = json.loads(io.open(app_paths.get_config_path("appearance.json"),
                                  encoding="utf-8").read())
@@ -189,7 +189,7 @@ class PersistedValueCompatTest(unittest.TestCase):
         self.assertEqual(raw["density"], "紧凑")
 
     def test_legacy_chinese_config_still_loads(self):
-        import app_paths
+        from taiplan import app_paths
 
         p = app_paths.get_config_path("appearance.json")
         Path(p).parent.mkdir(parents=True, exist_ok=True)
@@ -209,12 +209,12 @@ class RuntimePurityTest(unittest.TestCase):
         os.environ["TODO_APP_DATA_DIR"] = cls.tmp
         os.environ["TODO_APP_DISABLE_MIGRATION"] = "1"
         os.environ.pop("TODO_APP_LEGACY_APP_DIR", None)
-        import database
+        from taiplan import database
 
         cls._db_path = database.DB_PATH
         database.DB_PATH = str(Path(cls.tmp) / "todo.db")
         database.init_database()
-        import services
+        from taiplan import services
 
         services.create_task("Sample task", date="2026-10-07", time="09:00",
                              duration_minutes=60, priority="urgent")
@@ -226,7 +226,7 @@ class RuntimePurityTest(unittest.TestCase):
     def tearDownClass(cls):
         import shutil as _sh
 
-        import database
+        from taiplan import database
 
         database.DB_PATH = cls._db_path
         if cls._env is None:
@@ -239,7 +239,7 @@ class RuntimePurityTest(unittest.TestCase):
     def _texts(self, nav):
         from streamlit.testing.v1 import AppTest
 
-        import ui.icons as icons
+        from taiplan.ui import icons as icons
 
         at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=120)
         at.run()
@@ -263,7 +263,7 @@ class RuntimePurityTest(unittest.TestCase):
         return out
 
     def test_en_us_pages_have_no_chinese_text(self):
-        import ui.icons as icons
+        from taiplan.ui import icons as icons
 
         bad = {}
         for nav in (icons.NAV_TODAY, icons.NAV_INBOX, icons.NAV_CALENDAR, icons.NAV_UPCOMING,
@@ -278,9 +278,9 @@ class RuntimePurityTest(unittest.TestCase):
         """非空验证：切回 zh-CN 必须出现中文，否则上面的断言可能是空测。"""
         import json
 
-        import ui.icons as icons
-        from i18n import LANGUAGE_ZH_CN
-        import i18n
+        from taiplan.ui import icons as icons
+        from taiplan.i18n import LANGUAGE_ZH_CN
+        from taiplan import i18n
 
         cfg = Path(self.tmp) / "config" / "language_config.json"
         cfg.write_text(json.dumps({"language": LANGUAGE_ZH_CN}), encoding="utf-8")

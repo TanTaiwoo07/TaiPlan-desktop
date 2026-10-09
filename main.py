@@ -30,7 +30,7 @@ import os
 from pathlib import Path
 import sys
 
-import product_info
+from taiplan import product_info
 
 CHILD_FLAG = "--streamlit-child"
 SMOKE_FLAG = "--smoke-test"
@@ -78,7 +78,7 @@ def _fatal(title_text, body_text) -> None:
 def _t(key, fallback, **kwargs):
     """尽量走 i18n；任何失败都退回英文，保证错误提示一定出得来。"""
     try:
-        from i18n import t as _i18n_t
+        from taiplan.i18n import t as _i18n_t
 
         text = _i18n_t(key)
         if text and text != key:
@@ -97,7 +97,7 @@ def _report_blocked(payload) -> None:
     且只有在 legacy 目录**确实存在数据库**时才提到它——全新用户不该看到
     "你的旧数据仍在某个旧目录里" 这种无中生有的提示。
     """
-    import app_paths as _ap
+    from taiplan import app_paths as _ap
 
     target = str(getattr(payload, "target_dir", None) or _ap.get_user_data_dir())
     legacy_dir = Path(getattr(payload, "legacy_dir", None) or _ap.get_legacy_app_dir())
@@ -124,7 +124,7 @@ def _report_blocked(payload) -> None:
 
 def _report_check_failed(exc_name, exc) -> None:
     """启动前数据检查自身出错：明确说明"未改动任何数据"。"""
-    import app_paths as _ap
+    from taiplan import app_paths as _ap
 
     body = "\n".join([
         _t("error.data_check_failed_title", "TaiPlan could not check its data folder."),
@@ -149,30 +149,30 @@ def main(argv=None) -> int:
     # 判定前的日志改写 %TEMP%（app_paths.BOOTSTRAP_LOG_DIR_ENV），
     # 这样程序自己写的 bootstrap 文件不会让全新用户被误判成 partial 目标。
     try:
-        import app_paths
+        from taiplan import app_paths
     except Exception:  # noqa: BLE001
         app_paths = None
 
     if CHILD_FLAG in argv:
         # 标记住，防止任何路径又回到桌面运行时
         os.environ[CHILD_ENV] = "1"
-        import streamlit_runner
+        from taiplan import streamlit_runner
         return streamlit_runner.run_streamlit_child(parse_port(argv))
 
     if SMOKE_FLAG in argv:
-        import frozen_smoke
+        from taiplan import frozen_smoke
         return frozen_smoke.run_smoke_test()
 
     if "--relaunch" in argv:
         # 0.1.2：设置改主题基座后的自重启。与 --shutdown 相同的优雅退出路径，
         # 区别仅在于退出后由 runtime 消费标记文件重新拉起。
-        import desktop_runtime
+        from taiplan import desktop_runtime
 
         return desktop_runtime.request_shutdown()
 
     if SHUTDOWN_FLAG in argv:
         # 第 17 阶段：让运行中的实例优雅退出；没有实例则直接 exit 0（不起新实例）
-        import desktop_runtime
+        from taiplan import desktop_runtime
         return desktop_runtime.request_shutdown()
 
     if BENCH_FLAG in argv:
@@ -194,7 +194,7 @@ def main(argv=None) -> int:
                               str(app_paths.get_bootstrap_logs_dir()))
 
     try:
-        import data_dir_migration
+        from taiplan import data_dir_migration
         decision = data_dir_migration.ensure_data_dir()
     except Exception as exc:  # noqa: BLE001
         _report_check_failed(type(exc).__name__, exc)
@@ -203,11 +203,11 @@ def main(argv=None) -> int:
         _report_blocked(decision)
         return 3
 
-    import desktop_runtime
+    from taiplan import desktop_runtime
     # 判定通过：切回正式日志目录；只有此时才允许创建/写入 TaiPlan 数据目录。
     try:
         os.environ.pop(app_paths.BOOTSTRAP_LOG_DIR_ENV, None)
-        import logging_config
+        from taiplan import logging_config
         logging_config.rebind_to_official_logs()
         app_paths.ensure_user_directories()
     except Exception:  # noqa: BLE001

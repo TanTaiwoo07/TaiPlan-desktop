@@ -3,9 +3,9 @@
 import unittest
 from datetime import date
 
-import calendar_adapter as ca
-import calendar_settings
-from models import TaskOccurrence
+from taiplan import calendar_adapter as ca
+from taiplan import calendar_settings
+from taiplan.models import TaskOccurrence
 
 
 def _occ(**kw):

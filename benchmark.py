@@ -46,7 +46,7 @@ def prepare_isolated_env():
 @contextlib.contextmanager
 def count_sql():
     """用 SQLite 的 trace callback 统计一次操作里执行了多少条 SQL。"""
-    import database
+    from taiplan import database
 
     counter = {"n": 0}
     original = database.get_connection
@@ -68,7 +68,7 @@ def count_sql():
 
 def seed_database(task_count=120, recurring_count=12):
     """造一份有代表性的数据：普通任务 + 重复任务 + 若干历史完成。"""
-    import services
+    from taiplan import services
     from datetime import date, timedelta
 
     today = date.today()
@@ -112,9 +112,9 @@ def seed_database(task_count=120, recurring_count=12):
 # ----------------------------------------------------------------------
 
 def build_operations():
-    import calendar_adapter
-    import recurrence
-    import services
+    from taiplan import calendar_adapter
+    from taiplan import recurrence
+    from taiplan import services
     from datetime import date, timedelta
 
     today = date.today()
@@ -174,8 +174,8 @@ def build_operations():
 
 def run(samples=DEFAULT_SAMPLES, out_path=None):
     tmp = prepare_isolated_env()
-    import database
-    import performance
+    from taiplan import database
+    from taiplan import performance
 
     database.init_database()
     t0 = time.perf_counter()

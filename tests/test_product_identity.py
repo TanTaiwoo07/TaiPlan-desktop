@@ -16,17 +16,17 @@ from tests import tests_env  # noqa: F401
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-import version  # noqa: E402
+from taiplan import version  # noqa: E402
 
 LEGACY_ALLOWED_FILES = {
-    "app_paths.py",            # legacy 数据目录名（迁移源）
-    "data_dir_migration.py",   # W3 迁移
-    "data_migration.py",       # 第 14 阶段旧迁移
-    "ai_settings.py",          # legacy 凭据身份回退
-    "windows_app_registration.py",   # legacy AUMID 常量
-    "startup_manager.py",      # 旧启动项迁移
+    "taiplan/app_paths.py",            # legacy 数据目录名（迁移源）
+    "taiplan/data_dir_migration.py",   # W3 迁移
+    "taiplan/data_migration.py",       # 第 14 阶段旧迁移
+    "taiplan/ai_settings.py",          # legacy 凭据身份回退
+    "taiplan/windows_app_registration.py",   # legacy AUMID 常量
+    "taiplan/startup_manager.py",      # 旧启动项迁移
     "create_shortcut.py",      # 旧快捷方式清理
-    "first_run.py",            # 升级兼容接入
+    "taiplan/first_run.py",            # 升级兼容接入
     "README.md",               # W5 处理
     "RELEASE_NOTES.md",
     "INSTALLER_FAILURE_TEST.md",
@@ -43,7 +43,7 @@ LEGACY_ALLOWED_PATTERNS = (
 
 class IdentityConstantsTest(unittest.TestCase):
     def test_app_metadata_identity(self):
-        import app_metadata
+        from taiplan import app_metadata
 
         self.assertEqual(app_metadata.APP_NAME, "TaiPlan")
         self.assertEqual(app_metadata.APP_ID, "TaiWoo.TaiPlan")
@@ -53,7 +53,7 @@ class IdentityConstantsTest(unittest.TestCase):
         self.assertEqual(app_metadata.CREDENTIAL_SERVICE, "TaiPlan-AI")
 
     def test_legacy_constants_kept_for_compat(self):
-        import app_metadata
+        from taiplan import app_metadata
 
         self.assertEqual(app_metadata.LEGACY_APP_NAME, "Todo App")
         self.assertEqual(app_metadata.LEGACY_APP_ID, "TodoApp.Desktop")
@@ -61,7 +61,7 @@ class IdentityConstantsTest(unittest.TestCase):
         self.assertEqual(app_metadata.LEGACY_EXE_NAME, "TodoApp.exe")
 
     def test_product_info_identity(self):
-        import product_info
+        from taiplan import product_info
 
         self.assertEqual(product_info.APP_DISPLAY_NAME, "TaiPlan")
         self.assertEqual(product_info.APP_AUTHOR, "TaiWoo_Chen")
@@ -82,27 +82,27 @@ class IdentityConstantsTest(unittest.TestCase):
         self.assertEqual(pt.DEBUG_EXE, "TaiPlan-Debug.exe")
 
     def test_windows_identity(self):
-        import windows_app_registration as reg
+        from taiplan import windows_app_registration as reg
 
         self.assertEqual(reg.APP_USER_MODEL_ID, "TaiWoo.TaiPlan")
         self.assertEqual(reg.APP_DISPLAY_NAME, "TaiPlan")
         self.assertEqual(reg.LEGACY_APP_USER_MODEL_ID, "TodoApp.Desktop")
 
     def test_credential_identity(self):
-        import ai_settings
+        from taiplan import ai_settings
 
         self.assertEqual(ai_settings.SERVICE_NAME, "TaiPlan-AI")
         self.assertEqual(ai_settings.LEGACY_SERVICE_NAME, "TodoApp-AI")
 
     def test_data_dir_identity(self):
-        import app_paths
+        from taiplan import app_paths
 
         self.assertEqual(app_paths.APP_DIR_NAME, "TaiPlan")
         self.assertEqual(app_paths.LEGACY_APP_DIR_NAME, "TodoApp")
 
     def test_runtime_ports_unchanged(self):
         """W4 不得因为改名换端口。"""
-        import desktop_runtime
+        from taiplan import desktop_runtime
 
         self.assertEqual(desktop_runtime.LOCK_PORT, 18721)
         self.assertEqual(desktop_runtime.IPC_PORT, 18722)
@@ -112,7 +112,7 @@ class NoWrongMixingTest(unittest.TestCase):
     def _sources(self):
         """非测试源码 + spec/iss；跳过本测试文件自身（它按设计列出错误写法）。"""
         out = {}
-        for p in sorted(ROOT.glob("*.py")) + sorted((ROOT / "ui").glob("*.py")):
+        for p in sorted(ROOT.glob("*.py")) + sorted((ROOT / "taiplan" / "ui").glob("*.py")):
             rel = p.relative_to(ROOT).as_posix()
             if rel.startswith("test_") or rel == SELF:
                 continue
@@ -229,7 +229,7 @@ class UpgradeMigrationTest(unittest.TestCase):
         import os
         import tempfile
 
-        import startup_manager
+        from taiplan import startup_manager
 
         tmp = Path(tempfile.mkdtemp())
         old_dir = startup_manager.STARTUP_DIR

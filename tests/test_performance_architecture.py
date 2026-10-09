@@ -64,7 +64,7 @@ class PageLazyRenderTest(unittest.TestCase):
 class SidebarHoverTest(unittest.TestCase):
     def test_hover_is_pure_css(self):
         """rail hover 展开必须是纯 CSS：不产生 callback、不改 session_state。"""
-        theme = read("ui/theme.py")
+        theme = read("taiplan/ui/theme.py")
         self.assertIn(":hover", theme)
         # 不允许在 hover 相关代码里写 session_state / st.rerun / on_click
         for m in re.finditer(r"[^\n]*hover[^\n]*", theme):
@@ -75,13 +75,13 @@ class SidebarHoverTest(unittest.TestCase):
             self.assertNotIn("st.rerun", line, f"hover 规则里不应有 st.rerun: {line[:80]}")
 
     def test_only_one_persistent_ui_state(self):
-        layout = read("ui/layout.py")
+        layout = read("taiplan/ui/layout.py")
         self.assertIn("SIDEBAR_PINNED_KEY", layout)
         # 规则：侧栏的持久状态只能由 layout.py 这一个模块写入
         # （其它模块只能读），写入点本身集中在几个封装函数里。
         writes = len(re.findall(r"st\.session_state\[SIDEBAR_PINNED_KEY\]\s*=", layout))
         self.assertLessEqual(writes, 3, f"侧栏持久状态写入点有 {writes} 处，过多")
-        for name in ("app.py", "calendar_view.py"):
+        for name in ("app.py", "taiplan/calendar_view.py"):
             other = read(name)
             self.assertNotIn("session_state[SIDEBAR_PINNED_KEY] =", other,
                              f"{name} 不应直接写侧栏持久状态，应走 ui.layout")
@@ -102,7 +102,7 @@ class RerunPatternTest(unittest.TestCase):
         """
         flow_kw = ("return", "except", "else", "elif", "if ", "if(",
                    "break", "continue", "for ", "while ")
-        for name in ("app.py", "calendar_view.py"):
+        for name in ("app.py", "taiplan/calendar_view.py"):
             lines = read(name).split("\n")
             for i, line in enumerate(lines):
                 if "st.rerun()" not in line:
@@ -126,7 +126,7 @@ class RerunPatternTest(unittest.TestCase):
     def test_rerun_sites_are_counted_and_bounded(self):
         """rerun 点数量要有上限意识：新增到离谱就说明在靠 rerun 堆交互。"""
         total = sum(len(re.findall(r"st\.rerun\(\)", read(f)))
-                    for f in ("app.py", "calendar_view.py"))
+                    for f in ("app.py", "taiplan/calendar_view.py"))
         self.assertLess(total, 80, f"st.rerun() 共 {total} 处，增长过快需审视")
 
 
@@ -134,7 +134,7 @@ class RecurrenceRangeTest(unittest.TestCase):
     def test_projection_requires_range(self):
         import inspect
 
-        import recurrence
+        from taiplan import recurrence
 
         sig = inspect.signature(recurrence.get_occurrences_for_range)
         params = list(sig.parameters)
@@ -144,7 +144,7 @@ class RecurrenceRangeTest(unittest.TestCase):
     def test_next_occurrence_takes_after_date(self):
         import inspect
 
-        import recurrence
+        from taiplan import recurrence
 
         params = list(inspect.signature(recurrence.get_next_occurrence).parameters)
         self.assertIn("after_date", params)
@@ -154,14 +154,14 @@ class NPlusOneTest(unittest.TestCase):
     """昂贵的按任务查询必须批量化（禁止在循环里对单个 task 查库）。"""
 
     def test_no_single_item_batch_calls_in_loops(self):
-        for name in ("services.py", "calendar_view.py", "app.py"):
+        for name in ("taiplan/services.py", "taiplan/calendar_view.py", "app.py"):
             src = read(name)
             offenders = re.findall(r"\w*_for_tasks\(\[[^\]]*\]\)", src)
             self.assertEqual(offenders, [],
                              f"{name} 仍存在循环内单元素批量调用（N+1）: {offenders[:5]}")
 
     def test_upcoming_batches_once(self):
-        sv = read("services.py")
+        sv = read("taiplan/services.py")
         i = sv.find("def get_upcoming_items(")
         j = sv.find("\ndef ", i + 10)
         body = sv[i:j]
@@ -218,7 +218,7 @@ class SettingsLazyTest(unittest.TestCase):
 
     def test_settings_css_hooks_are_stable(self):
         """连续页的样式钩子必须是我们自己的稳定 key，不用随机类名。"""
-        layout_src = read("ui/layout.py")
+        layout_src = read("taiplan/ui/layout.py")
         self.assertIn('SETTINGS_TOC_KEY = "settings_toc"', layout_src)
         self.assertIn('SETTINGS_SECTION_PREFIX = "settings_section_"', layout_src)
         self.assertIn("settings_anchor", layout_src)
@@ -226,17 +226,17 @@ class SettingsLazyTest(unittest.TestCase):
 
 class DataRevisionTest(unittest.TestCase):
     def test_revision_exists_and_bumps(self):
-        perf = read("performance.py")
+        perf = read("taiplan/performance.py")
         self.assertIn("get_perf_snapshot", perf)
 
     def test_ai_imports_are_lazy(self):
         """AI 依赖不得出现在 app.py 模块顶层（会拖慢冷启动）。"""
         app = read("app.py")
         head = app[:app.find("\n\n\n")]
-        self.assertNotIn("from ai_client import", head)
+        self.assertNotIn("from taiplan.ai_client import", head)
         self.assertNotIn("\nimport ai_settings", head)
         # 但它必须仍能被用到（局部 import 存在）
-        self.assertIn("from ai_client import", app)
+        self.assertIn("from taiplan.ai_client import", app)
         self.assertIn("import ai_settings", app)
 
 

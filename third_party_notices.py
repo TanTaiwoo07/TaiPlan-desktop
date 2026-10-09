@@ -155,12 +155,22 @@ def bundle_top_levels(dist_dir: Path, build_dir: Path | None = None):
 
 
 def own_resource_names() -> set[str]:
-    """项目自有内容：自己的模块（*.py）与资源目录（assets/tools/ui 等）。"""
+    """项目自有内容：自己的模块（*.py）与资源目录（assets/tools/taiplan 等）。
+
+    运行时模块都在 ``taiplan/`` 包里（含 ``taiplan/ui``、``taiplan/i18n`` 子包），
+    所以要递归收集——只看根目录会把自家模块误判成第三方。
+    """
     names = set(OWN_RESOURCE_DIRS)
     try:
         for entry in ROOT.iterdir():
             if entry.is_dir():
                 names.add(entry.name)
+                if entry.name == "taiplan":
+                    # 包内的模块与子包
+                    for sub in entry.rglob("*.py"):
+                        names.add(sub.stem)
+                    for sub in entry.glob("*/"):
+                        names.add(sub.name)
             elif entry.suffix == ".py":
                 names.add(entry.stem)          # 自己的模块，不是第三方
     except OSError:

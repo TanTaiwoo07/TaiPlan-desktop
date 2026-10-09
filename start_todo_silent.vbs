@@ -10,7 +10,7 @@ Set shell = CreateObject("WScript.Shell")
 
 baseDir = fso.GetParentFolderName(WScript.ScriptFullName)
 pythonw = fso.BuildPath(baseDir, ".venv\Scripts\pythonw.exe")
-launcher = fso.BuildPath(baseDir, "launcher.py")
+launcher = fso.BuildPath(baseDir, "taiplan\launcher.py")
 
 If Not fso.FolderExists(baseDir) Then
     MsgBox "TaiPlan could not start: project folder not found." & vbCrLf & baseDir, 16, "TaiPlan"
@@ -23,7 +23,7 @@ If Not fso.FileExists(pythonw) Then
 End If
 
 If Not fso.FileExists(launcher) Then
-    MsgBox "TaiPlan could not start: launcher.py not found." & vbCrLf & launcher, 16, "TaiPlan"
+    MsgBox "TaiPlan could not start: taiplan\launcher.py not found." & vbCrLf & launcher, 16, "TaiPlan"
     WScript.Quit 4
 End If
 

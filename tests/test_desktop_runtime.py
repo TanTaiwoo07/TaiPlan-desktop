@@ -10,14 +10,14 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-import desktop_notifier as dn
-import desktop_runtime as dr
-import desktop_window as dw
-import runtime_config
+from taiplan import desktop_notifier as dn
+from taiplan import desktop_runtime as dr
+from taiplan import desktop_window as dw
+from taiplan import runtime_config
 import create_shortcut
-import notification_service as notif
-from reminder_worker import ReminderWorker
-from desktop_notifier import DesktopNotifier, NotificationResult
+from taiplan import notification_service as notif
+from taiplan.reminder_worker import ReminderWorker
+from taiplan.desktop_notifier import DesktopNotifier, NotificationResult
 
 
 # ---------------------------------------------------------------
@@ -302,12 +302,12 @@ class ShortcutTest(unittest.TestCase):
 class TrayTest(unittest.TestCase):
 
     def test_build_tray_returns_icon(self):
-        import tray_app
+        from taiplan import tray_app
         icon = tray_app.build_tray(on_quit=lambda: None, on_show_window=lambda: None)
         self.assertIsNotNone(icon)
 
     def test_reminder_menu_label(self):
-        import tray_app
+        from taiplan import tray_app
         with mock.patch.object(tray_app.notif, "load_notification_config",
                                return_value={"enabled": True}):
             self.assertEqual(tray_app._reminder_menu_label(None), "暂停提醒")

@@ -8,10 +8,10 @@ from pathlib import Path
 
 from tests import tests_env  # noqa: F401
 
-import app_paths
-import data_backup
-import database
-import services
+from taiplan import app_paths
+from taiplan import data_backup
+from taiplan import database
+from taiplan import services
 
 
 class BackupTest(unittest.TestCase):

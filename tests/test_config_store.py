@@ -8,8 +8,8 @@ from pathlib import Path
 
 from tests import tests_env  # noqa: F401
 
-import app_paths
-import config_store
+from taiplan import app_paths
+from taiplan import config_store
 
 
 class ConfigStoreTest(unittest.TestCase):
@@ -86,7 +86,7 @@ class ConfigStoreTest(unittest.TestCase):
 
     def test_existing_module_configs_are_writable_in_isolation(self):
         """隔离环境下写真实模块的配置路径，也不应落到项目目录。"""
-        import calendar_settings
+        from taiplan import calendar_settings
         calendar_settings.save_calendar_config(calendar_settings.load_calendar_config())
         self.assertTrue(calendar_settings.CONFIG_PATH.is_file())
         self.assertFalse(str(calendar_settings.CONFIG_PATH)

@@ -8,7 +8,7 @@
 import unittest
 from datetime import datetime
 
-from datetime_parser import parse_flexible_date, parse_flexible_time, parse_flexible_datetime, DateTimeParseError
+from taiplan.datetime_parser import parse_flexible_date, parse_flexible_time, parse_flexible_datetime, DateTimeParseError
 
 NOW = datetime(2026, 10, 3, 0, 15)
 

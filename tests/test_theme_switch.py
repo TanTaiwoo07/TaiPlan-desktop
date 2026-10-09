@@ -28,7 +28,7 @@ class ThemeOptionsTest(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp(prefix="themeopt_"))
         self._env = os.environ.get("TODO_APP_DATA_DIR")
         os.environ["TODO_APP_DATA_DIR"] = str(self.tmp)
-        import ui.theme as theme
+        from taiplan.ui import theme as theme
 
         self.theme = theme
 
@@ -56,7 +56,7 @@ class ThemeOptionsTest(unittest.TestCase):
 
     def test_runner_injects_theme_options(self):
         """child_flag_options 必须带上 theme.*（frozen 的 server 参数）。"""
-        import streamlit_runner
+        from taiplan import streamlit_runner
 
         options = streamlit_runner.child_flag_options(8501)
         self.assertIn("client.toolbarMode", options)
@@ -66,7 +66,7 @@ class ThemeOptionsTest(unittest.TestCase):
 
 class CssOverrideTest(unittest.TestCase):
     def test_build_css_pins_widget_colors_both_modes(self):
-        import ui.theme as theme
+        from taiplan.ui import theme as theme
 
         for mode in ("light", "dark"):
             css = theme.build_css(mode)
@@ -75,7 +75,7 @@ class CssOverrideTest(unittest.TestCase):
             self.assertIn('button[kind="secondary"]', css)
 
     def test_light_and_dark_pin_different_values(self):
-        import ui.theme as theme
+        from taiplan.ui import theme as theme
 
         self.assertIn("#F6F7F9", theme.build_css("light"))
         self.assertIn("#15181D", theme.build_css("dark"))
@@ -95,7 +95,7 @@ class RestartMechanismTest(unittest.TestCase):
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def test_flag_roundtrip(self):
-        import app_paths
+        from taiplan import app_paths
 
         flag = app_paths.get_restart_flag_path()
         self.assertIn("state", str(flag), "标记必须放在 state/（程序自己的目录）")
@@ -107,8 +107,8 @@ class RestartMechanismTest(unittest.TestCase):
 
     def test_runtime_consumes_flag_and_relaunches(self):
         """desktop_runtime._maybe_relaunch_after_exit：有标记 → Popen 自身并删标记。"""
-        import app_paths
-        import desktop_runtime
+        from taiplan import app_paths
+        from taiplan import desktop_runtime
 
         flag = app_paths.get_restart_flag_path()
         flag.parent.mkdir(parents=True, exist_ok=True)
@@ -132,7 +132,7 @@ class StartupModeTest(unittest.TestCase):
         self.tmp = Path(tempfile.mkdtemp(prefix="thememode_"))
         self._env = os.environ.get("TODO_APP_DATA_DIR")
         os.environ["TODO_APP_DATA_DIR"] = str(self.tmp)
-        import ui.theme as theme
+        from taiplan.ui import theme as theme
 
         theme._startup_mode = None          # 重置进程内缓存
         self.theme = theme

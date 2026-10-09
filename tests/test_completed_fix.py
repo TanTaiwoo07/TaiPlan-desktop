@@ -9,9 +9,9 @@ import os
 import tempfile
 import unittest
 
-import database
-import recurrence
-import services
+from taiplan import database
+from taiplan import recurrence
+from taiplan import services
 
 
 class CompletedFixTest(unittest.TestCase):

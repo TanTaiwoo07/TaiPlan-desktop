@@ -16,7 +16,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 import build  # noqa: E402
 import packaging_tools  # noqa: E402
-import version as app_version  # noqa: E402
+from taiplan import version as app_version  # noqa: E402
 
 
 def _tmpdir():
@@ -152,7 +152,7 @@ class BuildScriptSafetyTest(unittest.TestCase):
             build._assert_inside_project(outside)
 
     def test_refuses_to_delete_user_data_dir(self):
-        import app_paths
+        from taiplan import app_paths
 
         data_dir = Path(app_paths.get_user_data_dir()).resolve()
         # 只有在测试隔离生效时才安全地断言（此时数据目录在临时区）
@@ -226,13 +226,13 @@ class SpecTest(unittest.TestCase):
 
 class RuntimeIntegrationTest(unittest.TestCase):
     def test_desktop_runtime_no_longer_builds_dash_m_streamlit(self):
-        text = (PROJECT_ROOT / "desktop_runtime.py").read_text(encoding="utf-8")
+        text = (PROJECT_ROOT / "taiplan/desktop_runtime.py").read_text(encoding="utf-8")
         self.assertNotIn('"-m", "streamlit"', text)
         self.assertIn("streamlit_runner.start_streamlit_subprocess", text)
         self.assertIn("streamlit_runner.stop_streamlit_subprocess", text)
 
     def test_required_packaging_files_exist(self):
-        for name in ("main.py", "streamlit_runner.py", "frozen_smoke.py",
+        for name in ("main.py", "taiplan/streamlit_runner.py", "taiplan/frozen_smoke.py",
                      "packaging_tools.py", "TaiPlan.spec", "build.py",
                      "assets/app_icon.ico", "tools/toast.ps1"):
             self.assertTrue((PROJECT_ROOT / name).exists(), f"缺少 {name}")

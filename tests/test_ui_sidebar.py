@@ -17,9 +17,9 @@ from pathlib import Path
 
 from tests import tests_env  # noqa: F401  必须早于项目模块导入
 
-import ui.icons as icons
-import ui.layout as layout
-import ui.theme as theme
+from taiplan.ui import icons as icons
+from taiplan.ui import layout as layout
+from taiplan.ui import theme as theme
 
 from streamlit.testing.v1 import AppTest
 
@@ -30,8 +30,8 @@ ROOT = Path(__file__).resolve().parent.parent
 class _Base(unittest.TestCase):
 
     def setUp(self):
-        import database
-        import services
+        from taiplan import database
+        from taiplan import services
         import tempfile
         self.tmp = tempfile.mktemp(suffix=".db")
         database.DB_PATH = self.tmp
@@ -71,7 +71,7 @@ class MaterialIconLeakTest(_Base):
 
     def test_no_malformed_material_syntax_in_source(self):
         pattern = re.compile(":" + "material" + r"[_-][a-zA-Z]")
-        targets = [p for p in ROOT.glob("*.py")] + [p for p in (ROOT / "ui").glob("*.py")]
+        targets = [p for p in ROOT.glob("*.py")] + [p for p in (ROOT / "taiplan" / "ui").glob("*.py")]
         offenders = []
         for path in targets:
             for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -175,7 +175,7 @@ class StateModelTest(_Base):
 
     def test_single_persistent_state(self):
         self.assertEqual(layout.SIDEBAR_PINNED_KEY, "sidebar_pinned")
-        src = (ROOT / "ui" / "layout.py").read_text(encoding="utf-8")
+        src = (ROOT / "taiplan" / "ui" / "layout.py").read_text(encoding="utf-8")
         for banned in ("nav_hover", "sidebar_hovered", "sidebar_expanded",
                        "sidebar_temp_expanded", "nav_hovered"):
             self.assertNotIn(banned, src)
@@ -204,7 +204,7 @@ class StateModelTest(_Base):
 
     def test_hover_has_no_callback_in_source(self):
         """hover 必须是纯 CSS：源码里不能有 hover 回调去改 state。"""
-        for rel in ("ui/layout.py", "ui/theme.py", "app.py"):
+        for rel in ("taiplan/ui/layout.py", "taiplan/ui/theme.py", "app.py"):
             src = (ROOT / rel).read_text(encoding="utf-8")
             for banned in ("on_hover", "on_mouseover", "on_mouse_enter"):
                 self.assertNotIn(banned, src, f"{rel} 不应有 {banned}")
@@ -251,7 +251,7 @@ class OptionalLibraryTest(unittest.TestCase):
     """streamlit-rail-nav 是可选的第三方增强，缺失也必须能跑。"""
 
     def test_app_does_not_require_rail_nav(self):
-        for rel in ("app.py", "ui/layout.py", "ui/theme.py"):
+        for rel in ("app.py", "taiplan/ui/layout.py", "taiplan/ui/theme.py"):
             src = (ROOT / rel).read_text(encoding="utf-8")
             self.assertNotIn("import streamlit_rail_nav", src)
             self.assertNotIn("from streamlit_rail_nav", src)
@@ -281,16 +281,16 @@ class TooltipResidueTest(unittest.TestCase):
         return rows
 
     def test_no_help_tooltips_in_sidebar(self):
-        path = Path(__file__).resolve().parent.parent / "ui" / "layout.py"
+        path = Path(__file__).resolve().parent.parent / "taiplan" / "ui" / "layout.py"
         self.assertEqual(self._help_calls(path), [],
                          "侧栏不允许再出现 help=（会留下不消失的提示气泡）")
 
     def test_nav_labels_are_still_rendered_and_hover_revealed(self):
         """去掉气泡不等于去掉标签：标签仍渲染，rail 悬停由 CSS 恢复。"""
-        src = io.open(Path(__file__).resolve().parent.parent / "ui" / "layout.py",
+        src = io.open(Path(__file__).resolve().parent.parent / "taiplan" / "ui" / "layout.py",
                       encoding="utf-8-sig").read()
         self.assertIn('st.button(label, key=f"nav_item_{key}"', src)
-        theme = io.open(Path(__file__).resolve().parent.parent / "ui" / "theme.py",
+        theme = io.open(Path(__file__).resolve().parent.parent / "taiplan" / "ui" / "theme.py",
                         encoding="utf-8-sig").read()
         self.assertIn('.st-key-appnav [data-testid="stButton"] button p', theme)
         self.assertIn('[data-testid="stSidebar"]:not(:hover)', theme)

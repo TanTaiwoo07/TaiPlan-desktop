@@ -3,7 +3,7 @@
 import unittest
 from unittest import mock
 
-import windows_app_registration as reg
+from taiplan import windows_app_registration as reg
 
 
 class AppRegistrationTest(unittest.TestCase):

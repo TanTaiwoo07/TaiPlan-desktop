@@ -11,7 +11,7 @@ import tempfile
 import unittest
 from unittest import mock
 
-import ai_settings
+from taiplan import ai_settings
 
 
 class AI_SettingsTest(unittest.TestCase):
@@ -74,7 +74,7 @@ class AI_SettingsTest(unittest.TestCase):
         self.assertNotEqual(cid_a, cid_b)
 
     # 6. keyring 保存 / 覆盖
-    @mock.patch("ai_settings.keyring")
+    @mock.patch("taiplan.ai_settings.keyring")
     def test_set_and_get_api_key(self, mock_keyring):
         mock_keyring.get_password.return_value = "sk-old"
         cid = "test-cid"
@@ -84,14 +84,14 @@ class AI_SettingsTest(unittest.TestCase):
             ai_settings.SERVICE_NAME, cid, "sk-new")
 
     # 7. 删除 key
-    @mock.patch("ai_settings.keyring")
+    @mock.patch("taiplan.ai_settings.keyring")
     def test_delete_api_key(self, mock_keyring):
         ai_settings.delete_api_key("test-cid")
         mock_keyring.delete_password.assert_called_once_with(
             ai_settings.SERVICE_NAME, "test-cid")
 
     # 8. keyring 异常不降级明文
-    @mock.patch("ai_settings.keyring")
+    @mock.patch("taiplan.ai_settings.keyring")
     def test_keyring_failure_raises(self, mock_keyring):
         mock_keyring.set_password.side_effect = RuntimeError("backend down")
         with self.assertRaises(RuntimeError):
@@ -106,7 +106,7 @@ class AI_SettingsTest(unittest.TestCase):
         self.assertIsInstance(cfg, dict)
 
     # 10. 旧版明文 Key 迁移
-    @mock.patch("ai_settings.keyring")
+    @mock.patch("taiplan.ai_settings.keyring")
     def test_migrate_legacy_plaintext(self, mock_keyring):
         # 写旧版含 api_key 的 JSON
         with open(ai_settings._CONFIG_PATH, "w", encoding="utf-8") as f:

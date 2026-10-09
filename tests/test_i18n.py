@@ -3,13 +3,13 @@
 import unittest
 from datetime import date, datetime
 
-import product_info
-from i18n import (LANGUAGE_EN_US, LANGUAGE_SYSTEM, LANGUAGE_ZH_CN, catalog,
+from taiplan import product_info
+from taiplan.i18n import (LANGUAGE_EN_US, LANGUAGE_SYSTEM, LANGUAGE_ZH_CN, catalog,
                   detect_system_language, get_language, get_setting,
                   resolve_language, set_language, t)
-from i18n import dates
-from i18n.en_US import STRINGS as EN
-from i18n.zh_CN import STRINGS as ZH
+from taiplan.i18n import dates
+from taiplan.i18n.en_US import STRINGS as EN
+from taiplan.i18n.zh_CN import STRINGS as ZH
 
 
 class CatalogTest(unittest.TestCase):
@@ -101,7 +101,7 @@ class TranslationTest(unittest.TestCase):
     def test_detect_fallback_is_definite(self):
         """§10：探测失败必须有明确 fallback（en-US）。"""
         self.assertIn(detect_system_language(), (LANGUAGE_ZH_CN, LANGUAGE_EN_US))
-        from i18n import FALLBACK_LANGUAGE
+        from taiplan.i18n import FALLBACK_LANGUAGE
 
         self.assertEqual(FALLBACK_LANGUAGE, LANGUAGE_EN_US)
 
@@ -112,8 +112,8 @@ class TranslationTest(unittest.TestCase):
         from pathlib import Path
 
         root = Path(__file__).resolve().parent.parent
-        files = [root / "app.py", root / "calendar_view.py", root / "tray_app.py"]
-        files += sorted((root / "ui").glob("*.py"))
+        files = [root / "app.py", root / "taiplan" / "calendar_view.py", root / "taiplan" / "tray_app.py"]
+        files += sorted((root / "taiplan" / "ui").glob("*.py"))
         bad = re.compile(r"if\s+(lang|language|locale)\s*==")
         hits = []
         for f in files:
@@ -177,7 +177,7 @@ class DateLocalizationTest(unittest.TestCase):
         import io
         from pathlib import Path
 
-        with io.open(Path(__file__).resolve().parent.parent / "i18n" / "dates.py",
+        with io.open(Path(__file__).resolve().parent.parent / "taiplan" / "i18n" / "dates.py",
                      encoding="utf-8") as fh:
             src = fh.read()
         self.assertNotIn("setlocale", src)
@@ -193,7 +193,7 @@ class ProductIdentityTest(unittest.TestCase):
         self.assertIn("2026 TaiWoo_Chen", product_info.APP_COPYRIGHT)
 
     def test_version_single_source(self):
-        import version
+        from taiplan import version
 
         self.assertEqual(product_info.APP_VERSION, version.__version__)
 
