@@ -11,8 +11,11 @@ build/
 dist/
 benchmarks/dist_after.json
 
-# ---- 发布产物：release/ 进仓库（安装包 + .sha256 校验文件）----
-# 注意：dist/ 是 193MB 的 onedir 目录，不入库；只入库压缩后的 Setup.exe
+# ---- 发布产物 ----
+# 安装包（约 57MB）**不进 git 历史**：二进制一旦入库就永久存在，之后每次 clone
+# 都要下载。安装包作为 GitHub Release 的附件分发，仓库里只保留 .sha256 校验值
+# 与 Release 正文，供他人核对下载完整性。
+release/*.exe
 
 # ---- 开发/走查期间的临时工作区 ----
 .zwork_todo_build/
